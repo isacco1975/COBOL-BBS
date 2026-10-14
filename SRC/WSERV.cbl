@@ -22,6 +22,8 @@
        77  FINAL-BUFFER             PIC X(80)          VALUE SPACES.
        77  BYTES-SENT               PIC S9(9)   COMP-5 VALUE 0.
        77  MSG-LEN                  PIC S9(9)   COMP-5 VALUE 0.
+       77  SOCKET-TIMEOUT       PIC S9(9) COMP-5 VALUE 1.
+       77  READY-SOCKET         PIC S9(9) COMP-5 VALUE 0.
 
        01 IDX                       PIC S9(4) COMP.
       
@@ -390,27 +392,42 @@
             END-IF
             .
       /*---------------------------------------------------------------*
-       READ-DATA.
-            DISPLAY 'DEBUG> READ-DATA'
-
-            PERFORM UNTIL 1 = 2
-               CALL "C$SLEEP" USING 0.3
-
-               MOVE SPACES TO BUFFER-IN
-               CALL "C$SOCKET" USING CSOCKET-NEXT-READ,
-                                     SERVER-SOCKET,
-                             GIVING  BYTES-READ
-
-               IF BYTES-READ > 0
-                   DISPLAY "Received MSG from client: " 
-                           BYTES-READ
-               END-IF
-            END-PERFORM
-            .
-      /*---------------------------------------------------------------*
        FLUSH-SOCKET.
             DISPLAY 'DEBUG> FLUSH-SOCKET'
             CALL "C$SOCKET" USING CSOCKET-FLUSH, CLIENT-SOCKET
             .
       /*---------------------------------------------------------------*
-      /*---------------------------------------------------------------*
+       READ-DATA.
+            DISPLAY 'DEBUG> In ascolto tasti in tempo reale dal C64...'
+
+            PERFORM UNTIL 1 = 2
+               MOVE 1 TO SOCKET-TIMEOUT
+
+               CALL "C$SOCKET" USING CSOCKET-NEXT-READ,
+                                    SERVER-SOCKET,
+                                    SOCKET-TIMEOUT
+                             GIVING READY-SOCKET
+
+               IF READY-SOCKET > 0
+                  IF READY-SOCKET = CLIENT-SOCKET
+                     MOVE SPACES TO BUFFER-IN
+                     CALL "C$SOCKET" USING CSOCKET-READ,
+                                          CLIENT-SOCKET,
+                                          BUFFER-IN,
+                                          1,
+                                   GIVING BYTES-READ
+
+                     IF BYTES-READ > 0
+                         DISPLAY ">>> TASTO RICEVUTO: [" BUFFER-IN(1:1) 
+                         "] | Codice ORD: " FUNCTION ORD(BUFFER-IN(1:1))
+      * ................ LOCAL ECHO 
+                         CALL "C$SOCKET" USING CSOCKET-WRITE,
+                                        CLIENT-SOCKET,
+                                        BUFFER-IN,
+                                        1,
+                                 GIVING BYTES-SENT
+                     END-IF
+                  END-IF
+               END-IF
+            END-PERFORM
+            .
