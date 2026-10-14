@@ -16,9 +16,8 @@
        77  CLIENT-SOCKET            PIC S9(9)   COMP-5 VALUE 0.
        77  RETURN-CODE-SOCKET       PIC S9(9)   COMP-5 VALUE 0.
        77  BUFFER-IN                PIC X(1024)        VALUE SPACES.
-       77  BYTES-READ               PIC S9(9)   COMP-5 VALUE 0.
        77  BUFFER-OUT               PIC X(80)          VALUE SPACES.
-       77  BUFFER-OUT2              PIC X(80)          VALUE SPACES.
+       77  BYTES-READ               PIC S9(9)   COMP-5 VALUE 0.
        77  FINAL-BUFFER             PIC X(100)         VALUE SPACES.
        77  BYTES-SENT               PIC S9(9)   COMP-5 VALUE 0.
        77  MSG-LEN                  PIC S9(9)   COMP-5 VALUE 0.
@@ -310,7 +309,7 @@
        BUILD-LISTENER,
             CALL "C$SOCKET" USING CSOCKET-CREATE-SERVER,
                                   SERVER-PORT,
-                            GIVING SERVER-SOCKET.
+                           GIVING SERVER-SOCKET.
 
             IF SERVER-SOCKET < 0
                DISPLAY "Error creating server socket."
@@ -360,10 +359,8 @@
 
             MOVE SPACES TO FINAL-BUFFER
             MOVE X'93'    TO FINAL-BUFFER(1:1)
-            MOVE BUFFER-OUT(1:24) TO FINAL-BUFFER(2:24)
-            MOVE X'0D'    TO FINAL-BUFFER(26:1)
-            MOVE X'0A'    TO FINAL-BUFFER(27:1)
-            MOVE 27       TO MSG-LEN
+            MOVE BUFFER-OUT(1:) TO FINAL-BUFFER(2:)
+            MOVE LENGTH OF FINAL-BUFFER TO MSG-LEN
 
             CALL "C$SOCKET" USING CSOCKET-WRITE,
                                  CLIENT-SOCKET,
@@ -380,12 +377,8 @@
 
             CALL "C$SLEEP" USING 0.2
 
-            MOVE SPACES TO FINAL-BUFFER
-            MOVE X'93'    TO FINAL-BUFFER(1:1)
-            MOVE BUFFER-OUT(1:24) TO FINAL-BUFFER(2:24)
-            MOVE X'0D'    TO FINAL-BUFFER(26:1)
-            MOVE X'0A'    TO FINAL-BUFFER(27:1)
-            MOVE 27       TO MSG-LEN
+            MOVE BUFFER-OUT TO FINAL-BUFFER
+            MOVE LENGTH OF FINAL-BUFFER TO MSG-LEN
 
             CALL "C$SOCKET" USING CSOCKET-WRITE,
                                  CLIENT-SOCKET,

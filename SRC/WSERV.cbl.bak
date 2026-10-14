@@ -16,15 +16,14 @@
        77  CLIENT-SOCKET            PIC S9(9)   COMP-5 VALUE 0.
        77  RETURN-CODE-SOCKET       PIC S9(9)   COMP-5 VALUE 0.
        77  BUFFER-IN                PIC X(1024)        VALUE SPACES.
-       77  BYTES-READ               PIC S9(9)   COMP-5 VALUE 0.
        77  BUFFER-OUT               PIC X(80)          VALUE SPACES.
-       77  BUFFER-OUT2              PIC X(80)          VALUE SPACES.
+       77  BYTES-READ               PIC S9(9)   COMP-5 VALUE 0.
        77  FINAL-BUFFER             PIC X(100)         VALUE SPACES.
        77  BYTES-SENT               PIC S9(9)   COMP-5 VALUE 0.
        77  MSG-LEN                  PIC S9(9)   COMP-5 VALUE 0.
 
        01 IDX                       PIC S9(4) COMP.
-       
+
       * CP437 (00H - FFH)
        01 CP437-TABLE.
           05 PIC X VALUE X'00'.
@@ -286,16 +285,16 @@
 
        01 CP437-CHAR REDEFINES CP437-TABLE.
           03 CP437-BYTE OCCURS 256 TIMES PIC X.
-          
+
        01 INPUT-TEXT  PIC X(80)
           VALUE "hELLO wOLRD - cp437 test".
-          
+
        01  WS-CODE-PAGE         PIC S9(4) VALUE 437.
        01  CHAR-CODE            PIC S9(4) COMP-5.
       /
-      / 
+      /
        PROCEDURE DIVISION.
-      /*---------------------------------------------------------------*        
+      /*---------------------------------------------------------------*
        MAIN-LOGIC.
             DISPLAY 'DEBUG> MAIN-LOGIC'
 
@@ -303,14 +302,14 @@
             PERFORM ACCEPT-CLIENTS
             PERFORM SEND-DATA
             PERFORM CLOSE-SOCKET
-            
+
             STOP RUN
             .
-      /*---------------------------------------------------------------*        
+      /*---------------------------------------------------------------*
        BUILD-LISTENER,
             CALL "C$SOCKET" USING CSOCKET-CREATE-SERVER,
                                   SERVER-PORT,
-                            GIVING SERVER-SOCKET.
+                           GIVING SERVER-SOCKET.
 
             IF SERVER-SOCKET < 0
                DISPLAY "Error creating server socket."
@@ -318,8 +317,8 @@
             END-IF
 
             DISPLAY "Server listening on port: " SERVER-PORT "..."
-            .                  
-      /*---------------------------------------------------------------*        
+            .
+      /*---------------------------------------------------------------*
        ACCEPT-CLIENTS.
             CALL "C$SOCKET" USING CSOCKET-ACCEPT,
                                   SERVER-SOCKET,
@@ -336,8 +335,8 @@
             ACCEPT OMITTED
             STOP RUN
             .
-      /*---------------------------------------------------------------*        
-       CONVERT-TO-CP437.           
+      /*---------------------------------------------------------------*
+       CONVERT-TO-CP437.
             PERFORM VARYING IDX FROM 1 BY 1
              UNTIL IDX > LENGTH OF INPUT-TEXT
               MOVE FUNCTION ORD(INPUT-TEXT(IDX:1)) TO CHAR-CODE
@@ -349,7 +348,7 @@
               END-IF
             END-PERFORM
             .
-      /*---------------------------------------------------------------*        
+      /*---------------------------------------------------------------*
        SEND-DATA.
             DISPLAY 'DEBUG> SEND-DATA'
 
@@ -396,8 +395,8 @@
             IF BYTES-SENT > 0
                 DISPLAY "Bytes SENT: " BYTES-SENT
             END-IF
-            .            
-      /*---------------------------------------------------------------*        
+            .
+      /*---------------------------------------------------------------*
        READ-DATA.
             DISPLAY 'DEBUG> READ-DATA'
             PERFORM
@@ -416,10 +415,9 @@
                END-IF
             END-PERFORM
             .
-      /*---------------------------------------------------------------*        
+      /*---------------------------------------------------------------*
        CLOSE-SOCKET.
             CALL "C$SOCKET" USING CSOCKET-CLOSE, CLIENT-SOCKET
             .
-      /*---------------------------------------------------------------*        
-      /*---------------------------------------------------------------*        
-     
+      /*---------------------------------------------------------------*
+      /*---------------------------------------------------------------*
