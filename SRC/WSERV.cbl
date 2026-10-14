@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. SOCKET-SERVER.
+       PROGRAM-ID. WSERV IS INITIAL PROGRAM.
 
        DATA DIVISION.
        WORKING-STORAGE SECTION.
@@ -23,9 +23,9 @@
        77  BYTES-SENT               PIC S9(9)   COMP-5 VALUE 0.
        77  MSG-LEN                  PIC S9(9)   COMP-5 VALUE 0.
 
-       01 IDX       PIC 9(4) COMP.
-       
-      * Tabella ufficiale CP437 (00H - FFH)
+       01 IDX                       PIC S9(4) COMP.
+
+      * CP437 (00H - FFH)
        01 CP437-TABLE.
           05 PIC X VALUE X'00'.
           05 PIC X VALUE X'01'.
@@ -286,25 +286,28 @@
 
        01 CP437-CHAR REDEFINES CP437-TABLE.
           03 CP437-BYTE OCCURS 256 TIMES PIC X.
-          
+
        01 INPUT-TEXT  PIC X(80)
           VALUE "hELLO wOLRD - cp437 test".
-       01 INPUT-TEXT2 PIC X(80)
-          VALUE "WELCOME TO  igp tech bbs cobol TEST".
 
-       01  WS-CODE-PAGE         PIC 9(4) VALUE 437.
-       01  CHAR-CODE            PIC 9(4) COMP-5.
-       
+       01  WS-CODE-PAGE         PIC S9(4) VALUE 437.
+       01  CHAR-CODE            PIC S9(4) COMP-5.
+      /
+      /
        PROCEDURE DIVISION.
-       
+      /*---------------------------------------------------------------*
        MAIN-LOGIC.
             DISPLAY 'DEBUG> MAIN-LOGIC'
 
-            PERFORM CONVERT-TO-CP437
-      *      DISPLAY "Original: " INPUT-TEXT
-      *      DISPLAY "CP437 Encoded: " BUFFER-OUT
+            PERFORM BUILD-LISTENER
+            PERFORM ACCEPT-CLIENTS
+            PERFORM SEND-DATA
+            PERFORM CLOSE-SOCKET
 
-      * 1. Create the listener
+            STOP RUN
+            .
+      /*---------------------------------------------------------------*
+       BUILD-LISTENER,
             CALL "C$SOCKET" USING CSOCKET-CREATE-SERVER,
                                   SERVER-PORT,
                             GIVING SERVER-SOCKET.
@@ -315,8 +318,9 @@
             END-IF
 
             DISPLAY "Server listening on port: " SERVER-PORT "..."
-
-      * 2. Waiting client connections
+            .
+      /*---------------------------------------------------------------*
+       ACCEPT-CLIENTS.
             CALL "C$SOCKET" USING CSOCKET-ACCEPT,
                                   SERVER-SOCKET,
                             GIVING CLIENT-SOCKET.
@@ -332,7 +336,7 @@
             ACCEPT OMITTED
             STOP RUN
             .
-
+      /*---------------------------------------------------------------*
        CONVERT-TO-CP437.
             PERFORM VARYING IDX FROM 1 BY 1
              UNTIL IDX > LENGTH OF INPUT-TEXT
@@ -344,19 +348,56 @@
                   MOVE "?" TO BUFFER-OUT(IDX:1)
               END-IF
             END-PERFORM
-
-            PERFORM VARYING IDX FROM 1 BY 1
-             UNTIL IDX > LENGTH OF INPUT-TEXT2
-              MOVE FUNCTION ORD(INPUT-TEXT2(IDX:1)) TO CHAR-CODE
-              IF CHAR-CODE >= 1 AND CHAR-CODE <= 256
-                  MOVE CP437-BYTE(CHAR-CODE)
-                      TO BUFFER-OUT2(IDX:1)
-              ELSE
-                  MOVE "?" TO BUFFER-OUT2(IDX:1)
-              END-IF
-            END-PERFORM
             .
-       /
+      /*---------------------------------------------------------------*
+       SEND-DATA.
+            DISPLAY 'DEBUG> SEND-DATA'
+
+            MOVE 'cIAO DA igp tech blog' TO INPUT-TEXT
+            PERFORM CONVERT-TO-CP437
+
+            CALL "C$SLEEP" USING 0.2
+
+            MOVE SPACES TO FINAL-BUFFER
+            MOVE X'93'    TO FINAL-BUFFER(1:1)
+            MOVE BUFFER-OUT(1:24) TO FINAL-BUFFER(2:24)
+            MOVE X'0D'    TO FINAL-BUFFER(26:1)
+            MOVE X'0A'    TO FINAL-BUFFER(27:1)
+            MOVE 27       TO MSG-LEN
+
+            CALL "C$SOCKET" USING CSOCKET-WRITE,
+                                 CLIENT-SOCKET,
+                                 FINAL-BUFFER,
+                                 MSG-LEN
+                          GIVING BYTES-SENT
+
+            IF BYTES-SENT > 0
+                DISPLAY "Bytes SENT: " BYTES-SENT
+            END-IF
+
+            MOVE 'BENVENUTI SULLA MIA NUOVA BBS' TO INPUT-TEXT
+            PERFORM CONVERT-TO-CP437
+
+            CALL "C$SLEEP" USING 0.2
+
+            MOVE SPACES TO FINAL-BUFFER
+            MOVE X'93'    TO FINAL-BUFFER(1:1)
+            MOVE BUFFER-OUT(1:24) TO FINAL-BUFFER(2:24)
+            MOVE X'0D'    TO FINAL-BUFFER(26:1)
+            MOVE X'0A'    TO FINAL-BUFFER(27:1)
+            MOVE 27       TO MSG-LEN
+
+            CALL "C$SOCKET" USING CSOCKET-WRITE,
+                                 CLIENT-SOCKET,
+                                 FINAL-BUFFER,
+                                 MSG-LEN
+                          GIVING BYTES-SENT
+
+            IF BYTES-SENT > 0
+                DISPLAY "Bytes SENT: " BYTES-SENT
+            END-IF
+            .
+      /*---------------------------------------------------------------*
        READ-DATA.
             DISPLAY 'DEBUG> READ-DATA'
             PERFORM
@@ -375,48 +416,9 @@
                END-IF
             END-PERFORM
             .
-       /
-       SEND-DATA.
-            DISPLAY 'DEBUG> SEND-DATA'
-            CALL "C$SLEEP" USING 1
-
-            MOVE SPACES TO FINAL-BUFFER
-            MOVE X'93'    TO FINAL-BUFFER(1:1)
-            MOVE BUFFER-OUT(1:24) TO FINAL-BUFFER(2:24)
-            MOVE X'0D'    TO FINAL-BUFFER(26:1)
-            MOVE X'0A'    TO FINAL-BUFFER(27:1)
-            MOVE 27       TO MSG-LEN
-
-            CALL "C$SOCKET" USING CSOCKET-WRITE,
-                                 CLIENT-SOCKET,
-                                 FINAL-BUFFER,
-                                 MSG-LEN
-                          GIVING BYTES-SENT
-
-            IF BYTES-SENT > 0
-                DISPLAY "Bytes SENT: " BYTES-SENT
-                CALL "C$SLEEP" USING 2
-      *          CALL "C$SOCKET" USING CSOCKET-CLOSE, CLIENT-SOCKET
-            END-IF
-
-
-            CALL "C$SLEEP" USING 1
-
-            MOVE SPACES TO FINAL-BUFFER
-            MOVE BUFFER-OUT2 TO FINAL-BUFFER
-            MOVE X'0D'    TO FINAL-BUFFER(36:1)
-            MOVE X'0A'    TO FINAL-BUFFER(36:1)
-            MOVE 37       TO MSG-LEN
-
-            CALL "C$SOCKET" USING CSOCKET-WRITE,
-                                 CLIENT-SOCKET,
-                                 FINAL-BUFFER,
-                                 MSG-LEN
-                          GIVING BYTES-SENT
-
-            IF BYTES-SENT > 0
-                DISPLAY "Bytes SENT: " BYTES-SENT
-                CALL "C$SLEEP" USING 2
-                CALL "C$SOCKET" USING CSOCKET-CLOSE, CLIENT-SOCKET
-            END-IF
+      /*---------------------------------------------------------------*
+       CLOSE-SOCKET.
+            CALL "C$SOCKET" USING CSOCKET-CLOSE, CLIENT-SOCKET
             .
+      /*---------------------------------------------------------------*
+      /*---------------------------------------------------------------*
