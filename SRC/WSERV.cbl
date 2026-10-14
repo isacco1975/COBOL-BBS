@@ -9,7 +9,8 @@
        78  CSOCKET-CREATE-CLIENT    VALUE 3.
        78  CSOCKET-WRITE            VALUE 5.
        78  CSOCKET-READ             VALUE 6.
-       78  CSOCKET-FLUSH            VALUE 8.
+       78  CSOCKET-NEXT-READ        VALUE 11.
+       78  CSOCKET-FLUSH            VALUE 7.
 
        77  SERVER-PORT              PIC 9(5)    COMP-5 VALUE 64000.
        77  SERVER-SOCKET            PIC S9(9)   COMP-5 VALUE 0.
@@ -18,12 +19,12 @@
        77  BUFFER-IN                PIC X(1024)        VALUE SPACES.
        77  BUFFER-OUT               PIC X(80)          VALUE SPACES.
        77  BYTES-READ               PIC S9(9)   COMP-5 VALUE 0.
-       77  FINAL-BUFFER             PIC X(100)         VALUE SPACES.
+       77  FINAL-BUFFER             PIC X(80)          VALUE SPACES.
        77  BYTES-SENT               PIC S9(9)   COMP-5 VALUE 0.
        77  MSG-LEN                  PIC S9(9)   COMP-5 VALUE 0.
 
        01 IDX                       PIC S9(4) COMP.
-
+      
       * CP437 (00H - FFH)
        01 CP437-TABLE.
           05 PIC X VALUE X'00'.
@@ -301,7 +302,8 @@
             PERFORM BUILD-LISTENER
             PERFORM ACCEPT-CLIENTS
             PERFORM SEND-DATA
-            PERFORM CLOSE-SOCKET
+            PERFORM FLUSH-SOCKET
+            PERFORM READ-DATA
 
             STOP RUN
             .
@@ -329,11 +331,6 @@
             END-IF
 
             DISPLAY "Client CONNECTED! Socket ID: " CLIENT-SOCKET.
-
-            PERFORM SEND-DATA
-
-            ACCEPT OMITTED
-            STOP RUN
             .
       /*---------------------------------------------------------------*
        CONVERT-TO-CP437.
@@ -358,9 +355,10 @@
             CALL "C$SLEEP" USING 0.2
 
             MOVE SPACES TO FINAL-BUFFER
+      * ... CLEAR HOME (CHR$(147))      
             MOVE X'93'    TO FINAL-BUFFER(1:1)
             MOVE BUFFER-OUT(1:) TO FINAL-BUFFER(2:)
-            MOVE LENGTH OF FINAL-BUFFER TO MSG-LEN
+            MOVE 41 TO MSG-LEN
 
             CALL "C$SOCKET" USING CSOCKET-WRITE,
                                  CLIENT-SOCKET,
@@ -372,13 +370,14 @@
                 DISPLAY "Bytes SENT: " BYTES-SENT
             END-IF
 
+            MOVE SPACES TO BUFFER-OUT
             MOVE 'BENVENUTI SULLA MIA NUOVA BBS' TO INPUT-TEXT
             PERFORM CONVERT-TO-CP437
 
             CALL "C$SLEEP" USING 0.2
 
             MOVE BUFFER-OUT TO FINAL-BUFFER
-            MOVE LENGTH OF FINAL-BUFFER TO MSG-LEN
+            MOVE 41 TO MSG-LEN
 
             CALL "C$SOCKET" USING CSOCKET-WRITE,
                                  CLIENT-SOCKET,
@@ -393,25 +392,25 @@
       /*---------------------------------------------------------------*
        READ-DATA.
             DISPLAY 'DEBUG> READ-DATA'
-            PERFORM
-               CALL "C$SLEEP" USING 0.5
+
+            PERFORM UNTIL 1 = 2
+               CALL "C$SLEEP" USING 0.3
 
                MOVE SPACES TO BUFFER-IN
-               CALL "C$SOCKET" USING CSOCKET-READ,
-                                    CLIENT-SOCKET,
-                                    BUFFER-IN,
-                                    LENGTH OF BUFFER-IN,
-                             GIVING BYTES-READ
+               CALL "C$SOCKET" USING CSOCKET-NEXT-READ,
+                                     SERVER-SOCKET,
+                             GIVING  BYTES-READ
 
                IF BYTES-READ > 0
-                   DISPLAY "Received MSG from client: "
-                           BUFFER-IN(1:BYTES-READ)
+                   DISPLAY "Received MSG from client: " 
+                           BYTES-READ
                END-IF
             END-PERFORM
             .
       /*---------------------------------------------------------------*
-       CLOSE-SOCKET.
-            CALL "C$SOCKET" USING CSOCKET-CLOSE, CLIENT-SOCKET
+       FLUSH-SOCKET.
+            DISPLAY 'DEBUG> FLUSH-SOCKET'
+            CALL "C$SOCKET" USING CSOCKET-FLUSH, CLIENT-SOCKET
             .
       /*---------------------------------------------------------------*
       /*---------------------------------------------------------------*
