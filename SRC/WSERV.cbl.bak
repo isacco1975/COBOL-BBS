@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. WSERV IS INITIAL PROGRAM.
+       PROGRAM-ID. WSERV IS RESIDENT PROGRAM.
 
        DATA DIVISION.
        WORKING-STORAGE SECTION.
@@ -22,11 +22,11 @@
        77  FINAL-BUFFER             PIC X(80)          VALUE SPACES.
        77  BYTES-SENT               PIC S9(9)   COMP-5 VALUE 0.
        77  MSG-LEN                  PIC S9(9)   COMP-5 VALUE 0.
-       77  SOCKET-TIMEOUT       PIC S9(9) COMP-5 VALUE 1.
-       77  READY-SOCKET         PIC S9(9) COMP-5 VALUE 0.
+       77  SOCKET-TIMEOUT           PIC S9(9)   COMP-5 VALUE 1.
+       77  READY-SOCKET             PIC S9(9)   COMP-5 VALUE 0.
 
        01 IDX                       PIC S9(4) COMP.
-      
+
       * CP437 (00H - FFH)
        01 CP437-TABLE.
           05 PIC X VALUE X'00'.
@@ -295,19 +295,89 @@
        01  WS-CODE-PAGE         PIC S9(4) VALUE 437.
        01  CHAR-CODE            PIC S9(4) COMP-5.
       /
+       LINKAGE SECTION.
       /
-       PROCEDURE DIVISION.
+       01 W-PARMS.
+          05 SOCK-THREAD        PIC S9(9) COMP-5.
+          05 W-DATA             PIC X(40).
+          05 OPERATION          PIC S9(4) COMP-5.
+             88 OP-SEND                    VALUE 1000.
+             88 OP-RECEIVE                 VALUE 1001.
+             88 OP-BUILD-LISTENER          VALUE 1002.
+             88 OP-BUILD-SOCKET            VALUE 1003.
+             88 OP-FLUSH-SOCKET            VALUE 1004.
+             88 OP-CLOSE-SOCKET            VALUE 1005.
+             88 OP-CRSR-CLRHOME            VALUE 147.
+             88 OP-CRSR-HOME               VALUE 83.
+             88 OP-CRSR-RVSON              VALUE 18.
+             88 OP-CRSR-RVSOFF             VALUE 146.
+             88 OP-CRSR-LEFT               VALUE 157.
+             88 OP-CRSR-RIGHT              VALUE 93.
+             88 OP-CRSR-UP                 VALUE 145.
+             88 OP-CRSR-DOWN               VALUE 17.
+             88 OP-CRSR-BLACK              VALUE 144.
+             88 OP-CRSR-WHITE              VALUE 5.
+             88 OP-CRSR-RED                VALUE 28.
+             88 OP-CRSR-CYAN               VALUE 159.
+             88 OP-CRSR-PURPLE             VALUE 156.
+             88 OP-CRSR-GREEN              VALUE 30.
+             88 OP-CRSR-BLUE               VALUE 31.
+             88 OP-CRSR-YELLOW             VALUE 158.
+             88 OP-CRSR-ORANGE             VALUE 129.
+             88 OP-CRSR-BROWN              VALUE 149.
+             88 OP-CRSR-PINK               VALUE 150.
+             88 OP-CRSR-DARKGREY           VALUE 151.
+             88 OP-CRSR-GREY               VALUE 152.
+             88 OP-CRSR-LIGHTGREEN         VALUE 153.
+             88 OP-CRSR-LIGHTBLUE          VALUE 154.
+             88 OP-CRSR-LIGHTGREY          VALUE 155.
+      / 
+      /
+       PROCEDURE DIVISION USING W-PARMS.
       /*---------------------------------------------------------------*
        MAIN-LOGIC.
-            DISPLAY 'DEBUG> MAIN-LOGIC'
+            DISPLAY 'WSERV DEBUG> MAIN-LOGIC'
 
-            PERFORM BUILD-LISTENER
-            PERFORM ACCEPT-CLIENTS
-            PERFORM SEND-DATA
-            PERFORM FLUSH-SOCKET
-            PERFORM READ-DATA
+            EVALUATE TRUE
+               WHEN OP-SEND            PERFORM SEND-DATA
+               WHEN OP-RECEIVE         PERFORM READ-DATA
+               WHEN OP-BUILD-LISTENER  PERFORM BUILD-LISTENER
+               WHEN OP-BUILD-SOCKET    PERFORM ACCEPT-CLIENT
+               WHEN OP-FLUSH-SOCKET    PERFORM FLUSH-SOCKET
+               WHEN OP-CLOSE-SOCKET    PERFORM DUMMY-PARA
+               WHEN OP-CRSR-CLRHOME    PERFORM DUMMY-PARA
+               WHEN OP-CRSR-HOME       PERFORM DUMMY-PARA
+               WHEN OP-CRSR-RVSON      PERFORM DUMMY-PARA
+               WHEN OP-CRSR-RVSOFF     PERFORM DUMMY-PARA
+               WHEN OP-CRSR-LEFT       PERFORM DUMMY-PARA
+               WHEN OP-CRSR-RIGHT      PERFORM DUMMY-PARA
+               WHEN OP-CRSR-UP         PERFORM DUMMY-PARA
+               WHEN OP-CRSR-DOWN       PERFORM DUMMY-PARA
+               WHEN OP-CRSR-BLACK      PERFORM DUMMY-PARA
+               WHEN OP-CRSR-WHITE      PERFORM DUMMY-PARA
+               WHEN OP-CRSR-RED        PERFORM DUMMY-PARA
+               WHEN OP-CRSR-CYAN       PERFORM DUMMY-PARA
+               WHEN OP-CRSR-PURPLE     PERFORM DUMMY-PARA
+               WHEN OP-CRSR-GREEN      PERFORM DUMMY-PARA
+               WHEN OP-CRSR-BLUE       PERFORM DUMMY-PARA
+               WHEN OP-CRSR-YELLOW     PERFORM DUMMY-PARA
+               WHEN OP-CRSR-ORANGE     PERFORM DUMMY-PARA
+               WHEN OP-CRSR-BROWN      PERFORM DUMMY-PARA
+               WHEN OP-CRSR-PINK       PERFORM DUMMY-PARA
+               WHEN OP-CRSR-DARKGREY   PERFORM DUMMY-PARA
+               WHEN OP-CRSR-GREY       PERFORM DUMMY-PARA
+               WHEN OP-CRSR-LIGHTGREEN PERFORM DUMMY-PARA
+               WHEN OP-CRSR-LIGHTBLUE  PERFORM DUMMY-PARA
+               WHEN OP-CRSR-LIGHTGREY  PERFORM DUMMY-PARA
+               WHEN OTHER              PERFORM DUMMY-PARA
+            END-EVALUATE
 
-            STOP RUN
+						ACCEPT OMITTED
+            GOBACK
+            .
+      /*---------------------------------------------------------------*
+       DUMMY-PARA.
+            CONTINUE
             .
       /*---------------------------------------------------------------*
        BUILD-LISTENER,
@@ -323,7 +393,7 @@
             DISPLAY "Server listening on port: " SERVER-PORT "..."
             .
       /*---------------------------------------------------------------*
-       ACCEPT-CLIENTS.
+       ACCEPT-CLIENT.
             CALL "C$SOCKET" USING CSOCKET-ACCEPT,
                                   SERVER-SOCKET,
                             GIVING CLIENT-SOCKET.
@@ -357,7 +427,7 @@
             CALL "C$SLEEP" USING 0.2
 
             MOVE SPACES TO FINAL-BUFFER
-      * ... CLEAR HOME (CHR$(147))      
+      * ... CLEAR HOME (CHR$(147))
             MOVE X'93'    TO FINAL-BUFFER(1:1)
             MOVE BUFFER-OUT(1:) TO FINAL-BUFFER(2:)
             MOVE 41 TO MSG-LEN
@@ -418,8 +488,14 @@
                                    GIVING BYTES-READ
 
                      IF BYTES-READ > 0
-                         DISPLAY ">>> TASTO RICEVUTO: [" BUFFER-IN(1:1) 
+                         DISPLAY ">>> TASTO RICEVUTO: [" BUFFER-IN(1:1)
                          "] | Codice ORD: " FUNCTION ORD(BUFFER-IN(1:1))
+      * ................ LOCAL ECHO
+                         CALL "C$SOCKET" USING CSOCKET-WRITE,
+                                        CLIENT-SOCKET,
+                                        BUFFER-IN,
+                                        1,
+                                 GIVING BYTES-SENT
                      END-IF
                   END-IF
                END-IF
