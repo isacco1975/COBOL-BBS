@@ -38,6 +38,7 @@
              88 OP-CRSR-LIGHTGREEN         VALUE 153.
              88 OP-CRSR-LIGHTBLUE          VALUE 154.
              88 OP-CRSR-LIGHTGREY          VALUE 155.
+             88 OP-CRLF                    VALUE 1310.
       / 
       /
        PROCEDURE DIVISION.
@@ -63,6 +64,16 @@
 
             SET OP-SEND           TO TRUE
             MOVE 'ANOTHER TEXT IN YELLOW' TO W-DATA
+            CALL "WSERV" USING W-PARMS
+
+            SET OP-CRLF           TO TRUE
+            CALL "WSERV" USING W-PARMS
+
+            SET OP-CRSR-LIGHTBLUE TO TRUE
+            CALL "WSERV" USING W-PARMS
+
+            SET OP-SEND           TO TRUE
+            MOVE 'a package to build your bbs in cobol' TO W-DATA
             CALL "WSERV" USING W-PARMS
 
             SET OP-FLUSH-SOCKET   TO TRUE
