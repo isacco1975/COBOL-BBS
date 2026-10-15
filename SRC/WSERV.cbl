@@ -294,6 +294,7 @@
 
        01  WS-CODE-PAGE         PIC S9(4) VALUE 437.
        01  CHAR-CODE            PIC S9(4) COMP-5.
+       01  WS-COUNT             PIC S9(4) COMP VALUE ZERO.
       /
        LINKAGE SECTION.
       /
@@ -345,7 +346,7 @@
                WHEN OP-BUILD-SOCKET    PERFORM ACCEPT-CLIENT
                WHEN OP-FLUSH-SOCKET    PERFORM FLUSH-SOCKET
                WHEN OP-CLOSE-SOCKET    PERFORM DUMMY-PARA
-               WHEN OP-CRSR-CLRHOME    PERFORM DUMMY-PARA
+               WHEN OP-CRSR-CLRHOME    PERFORM CLEAR-HOME
                WHEN OP-CRSR-HOME       PERFORM DUMMY-PARA
                WHEN OP-CRSR-RVSON      PERFORM DUMMY-PARA
                WHEN OP-CRSR-RVSOFF     PERFORM DUMMY-PARA
@@ -360,7 +361,7 @@
                WHEN OP-CRSR-PURPLE     PERFORM DUMMY-PARA
                WHEN OP-CRSR-GREEN      PERFORM DUMMY-PARA
                WHEN OP-CRSR-BLUE       PERFORM DUMMY-PARA
-               WHEN OP-CRSR-YELLOW     PERFORM DUMMY-PARA
+               WHEN OP-CRSR-YELLOW     PERFORM CRSR-YELLOW
                WHEN OP-CRSR-ORANGE     PERFORM DUMMY-PARA
                WHEN OP-CRSR-BROWN      PERFORM DUMMY-PARA
                WHEN OP-CRSR-PINK       PERFORM DUMMY-PARA
@@ -377,6 +378,25 @@
       /*---------------------------------------------------------------*
        DUMMY-PARA.
             CONTINUE
+            .
+      /*---------------------------------------------------------------*
+       CLEAR-HOME.
+            DISPLAY 'DEBUG> CLEAR-HOME'
+
+            MOVE W-DATA TO INPUT-TEXT
+            PERFORM CONVERT-TO-CP437
+
+            CALL "C$SLEEP" USING 0.2
+
+            MOVE X'93' TO FINAL-BUFFER
+            
+            INSPECT FINAL-BUFFER 
+                    REPLACING TRAILING SPACES BY LOW-VALUES
+            INSPECT FINAL-BUFFER
+                    TALLYING WS-COUNT FOR CHARACTERS BEFORE LOW-VALUES      
+                   
+            COMPUTE MSG-LEN = WS-COUNT + 1
+            PERFORM SEND-DATA
             .
       /*---------------------------------------------------------------*
        BUILD-LISTENER,
@@ -420,45 +440,43 @@
        SEND-DATA.
             DISPLAY 'DEBUG> SEND-DATA'
 
-            MOVE 'cIAO DA igp tech blog' TO INPUT-TEXT
+            MOVE W-DATA TO INPUT-TEXT
             PERFORM CONVERT-TO-CP437
 
             CALL "C$SLEEP" USING 0.2
 
             MOVE SPACES TO FINAL-BUFFER
       * ... CLEAR HOME (CHR$(147))
-            MOVE X'93'    TO FINAL-BUFFER(1:1)
-            MOVE BUFFER-OUT(1:) TO FINAL-BUFFER(2:)
-            MOVE 41 TO MSG-LEN
+            MOVE BUFFER-OUT TO FINAL-BUFFER
+            
+            INSPECT FINAL-BUFFER 
+                    REPLACING TRAILING SPACES BY LOW-VALUES
+            INSPECT FINAL-BUFFER
+                    TALLYING WS-COUNT FOR CHARACTERS BEFORE LOW-VALUES      
+                   
+            COMPUTE MSG-LEN = WS-COUNT + 1
+            MOVE X"0D0A" TO FINAL-BUFFER(MSG-LEN + 1:)
+            ADD 2 TO MSG-LEN
 
-            CALL "C$SOCKET" USING CSOCKET-WRITE,
-                                 CLIENT-SOCKET,
-                                 FINAL-BUFFER,
-                                 MSG-LEN
-                          GIVING BYTES-SENT
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-YELLOW.
+            DISPLAY 'DEBUG> CRSR-YELLOW'
 
-            IF BYTES-SENT > 0
-                DISPLAY "Bytes SENT: " BYTES-SENT
-            END-IF
-
-            MOVE SPACES TO BUFFER-OUT
-            MOVE 'BENVENUTI SULLA MIA NUOVA BBS' TO INPUT-TEXT
+            MOVE X'9E' TO FINAL-BUFFER
             PERFORM CONVERT-TO-CP437
 
             CALL "C$SLEEP" USING 0.2
+          
+            INSPECT FINAL-BUFFER 
+                    REPLACING TRAILING SPACES BY LOW-VALUES
+            INSPECT FINAL-BUFFER
+                    TALLYING WS-COUNT FOR CHARACTERS BEFORE LOW-VALUES      
+                   
+            COMPUTE MSG-LEN = WS-COUNT + 1
 
-            MOVE BUFFER-OUT TO FINAL-BUFFER
-            MOVE 41 TO MSG-LEN
-
-            CALL "C$SOCKET" USING CSOCKET-WRITE,
-                                 CLIENT-SOCKET,
-                                 FINAL-BUFFER,
-                                 MSG-LEN
-                          GIVING BYTES-SENT
-
-            IF BYTES-SENT > 0
-                DISPLAY "Bytes SENT: " BYTES-SENT
-            END-IF
+            PERFORM WRITE-SOCKET
             .
       /*---------------------------------------------------------------*
        FLUSH-SOCKET.
@@ -500,3 +518,15 @@
                END-IF
             END-PERFORM
             .
+      /
+       WRITE-SOCKET.            
+            CALL "C$SOCKET" USING CSOCKET-WRITE,
+                                 CLIENT-SOCKET,
+                                 FINAL-BUFFER,
+                                 MSG-LEN
+                          GIVING BYTES-SENT
+
+            IF BYTES-SENT > 0
+                DISPLAY "Bytes SENT: " BYTES-SENT
+            END-IF
+            .       

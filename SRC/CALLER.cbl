@@ -50,8 +50,19 @@
             
             SET OP-BUILD-SOCKET   TO TRUE
             CALL "WSERV" USING W-PARMS
+            
+            SET OP-CRSR-CLRHOME   TO TRUE
+            CALL "WSERV" USING W-PARMS
 
             SET OP-SEND           TO TRUE
+            MOVE 'WELCOME TO igp test bbs IN cobol' TO W-DATA
+            CALL "WSERV" USING W-PARMS
+
+            SET OP-CRSR-YELLOW   TO TRUE
+            CALL "WSERV" USING W-PARMS
+
+            SET OP-SEND           TO TRUE
+            MOVE 'ANOTHER TEXT IN YELLOW' TO W-DATA
             CALL "WSERV" USING W-PARMS
 
             SET OP-FLUSH-SOCKET   TO TRUE
