@@ -960,10 +960,10 @@
                WHEN OP-CRSR-YELLOW     PERFORM CRSR-YELLOW
                WHEN OP-CRSR-ORANGE     PERFORM DUMMY-PARA
                WHEN OP-CRSR-BROWN      PERFORM DUMMY-PARA
-               WHEN OP-CRSR-PINK       PERFORM DUMMY-PARA
-               WHEN OP-CRSR-DARKGREY   PERFORM DUMMY-PARA
-               WHEN OP-CRSR-GREY       PERFORM DUMMY-PARA
-               WHEN OP-CRSR-LIGHTGREEN PERFORM DUMMY-PARA
+               WHEN OP-CRSR-PINK       PERFORM CRSR-PINK
+               WHEN OP-CRSR-DARKGREY   PERFORM CRSR-DARKGREY
+               WHEN OP-CRSR-GREY       PERFORM CRSR-GREY
+               WHEN OP-CRSR-LIGHTGREEN PERFORM CRSR-LIGHTGREEN
                WHEN OP-CRSR-LIGHTBLUE  PERFORM CRSR-LIGHTBLUE
                WHEN OP-CRSR-LIGHTGREY  PERFORM DUMMY-PARA
                WHEN OTHER              PERFORM DUMMY-PARA
@@ -985,12 +985,6 @@
                      MOVE CP437-HEX(IDX) TO FINAL-BUFFER
             END-SEARCH
 
-            INSPECT FINAL-BUFFER
-                    REPLACING TRAILING SPACES BY LOW-VALUES
-            INSPECT FINAL-BUFFER
-                    TALLYING WS-COUNT FOR CHARACTERS BEFORE LOW-VALUES
-
-            COMPUTE MSG-LEN = WS-COUNT + 1
             PERFORM WRITE-SOCKET
             .
       /*---------------------------------------------------------------*
@@ -1034,7 +1028,7 @@
       /*---------------------------------------------------------------*
        SEND-DATA.
             DISPLAY 'DEBUG> SEND-DATA'
-            MOVE W-DATA TO INPUT-TEXT
+            MOVE W-DATA TO FINAL-BUFFER
             PERFORM WRITE-SOCKET
             .
       /*---------------------------------------------------------------*
@@ -1062,6 +1056,54 @@
             SET IDX TO 1
             SEARCH CP437-EL VARYING IDX
                   WHEN    CP437-VAL(IDX) = 146
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-PINK.
+            DISPLAY 'DEBUG> CRSR-PINK'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 150
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-DARKGREY.
+            DISPLAY 'DEBUG> CRSR-DARKGREY'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 151
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-GREY.
+            DISPLAY 'DEBUG> CRSR-GREY'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 152
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-LIGHTGREEN.
+            DISPLAY 'DEBUG> CRSR-LIGHTGREEN'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 153
                      MOVE CP437-HEX(IDX) TO FINAL-BUFFER
             END-SEARCH
 
@@ -1149,9 +1191,9 @@
             MOVE ZERO TO WS-COUNT
 
             INSPECT FINAL-BUFFER
-                    REPLACING TRAILING SPACES BY '|'
+                    REPLACING TRAILING SPACES BY LOW-VALUES
             INSPECT FINAL-BUFFER
-                    TALLYING WS-COUNT FOR CHARACTERS BEFORE '|'
+                    TALLYING WS-COUNT FOR CHARACTERS BEFORE LOW-VALUES
 
             COMPUTE MSG-LEN = WS-COUNT + 1
 

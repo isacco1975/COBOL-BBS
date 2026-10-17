@@ -58,43 +58,77 @@
             
             SET OP-BUILD-SOCKET   TO TRUE
             CALL "WSERV" USING W-PARMS
-           
+                     
             SET OP-CRSR-CLRHOME   TO TRUE
             CALL "WSERV" USING W-PARMS
 
-            SET OP-CRSR-RVSON     TO TRUE
+      *      SET OP-CRSR-RVSON     TO TRUE
+      *      CALL "WSERV" USING W-PARMS
+
+      *      SET OP-SEND-PETSCII   TO TRUE
+      *      CALL "WSERV" USING W-PARMS
+
+      *      SET OP-CRSR-RVSOFF    TO TRUE
+      *      CALL "WSERV" USING W-PARMS
+
+            SET OP-SEND           TO TRUE
+            MOVE '     WELCOME TO igp test bbs IN cobol' TO W-DATA
             CALL "WSERV" USING W-PARMS
 
-            SET OP-SEND-PETSCII   TO TRUE
+            SET OP-CRLF           TO TRUE
+            CALL "WSERV" USING W-PARMS 
+
+            SET OP-CRLF           TO TRUE
+            CALL "WSERV" USING W-PARMS 
+
+            SET OP-CRSR-YELLOW    TO TRUE
             CALL "WSERV" USING W-PARMS
 
-      *     SET OP-CRSR-RVSOFF    TO TRUE
-      *     CALL "WSERV" USING W-PARMS
+            SET OP-SEND           TO TRUE
+            MOVE '     WITH THIS COBOL FRAMEWOEK' TO W-DATA
+            CALL "WSERV" USING W-PARMS
 
-      *     SET OP-SEND           TO TRUE
-      *     MOVE '     WELCOME TO igp test bbs IN cobol' TO W-DATA
-      *     CALL "WSERV" USING W-PARMS
+            SET OP-CRLF           TO TRUE
+            CALL "WSERV" USING W-PARMS 
 
-      *     SET OP-CRSR-YELLOW    TO TRUE
-      *     CALL "WSERV" USING W-PARMS
+            SET OP-SEND           TO TRUE
+            MOVE '     YOU CAN BUILD YOUR OWN bbs!' TO W-DATA
+            CALL "WSERV" USING W-PARMS
 
-      *     SET OP-SEND           TO TRUE
-      *     MOVE '     WITH THIS COBOL FRAMEWOEK' TO W-DATA
-      *     CALL "WSERV" USING W-PARMS
+            SET OP-CRLF           TO TRUE
+            CALL "WSERV" USING W-PARMS 
 
-      *     SET OP-SEND           TO TRUE
-      *     MOVE '     YOU CAN BUILD YOUR OWN bbs!' TO W-DATA
-      *     CALL "WSERV" USING W-PARMS
+            SET OP-CRLF           TO TRUE
+            CALL "WSERV" USING W-PARMS 
 
-      *     SET OP-CRLF           TO TRUE
-      *     CALL "WSERV" USING W-PARMS 
+            SET OP-CRSR-LIGHTBLUE TO TRUE
+            CALL "WSERV" USING W-PARMS
 
-      *     SET OP-CRSR-LIGHTBLUE TO TRUE
-      *     CALL "WSERV" USING W-PARMS
+            SET OP-SEND           TO TRUE
+            MOVE '             --- menu --- ' TO W-DATA
+            CALL "WSERV" USING W-PARMS
 
-      *     SET OP-SEND           TO TRUE
-      *     MOVE '             --- menu --- ' TO W-DATA
-      *     CALL "WSERV" USING W-PARMS
+            SET OP-CRLF           TO TRUE
+            CALL "WSERV" USING W-PARMS 
+
+            SET OP-CRLF           TO TRUE
+            CALL "WSERV" USING W-PARMS 
+
+            SET OP-CRSR-LIGHTGREEN TO TRUE
+            CALL "WSERV" USING W-PARMS
+
+            SET OP-SEND           TO TRUE
+            MOVE '   1. Page #1 ' TO W-DATA
+            CALL "WSERV" USING W-PARMS
+
+            SET OP-CRLF           TO TRUE
+            CALL "WSERV" USING W-PARMS 
+
+            MOVE '   2. Page #2 ' TO W-DATA
+            CALL "WSERV" USING W-PARMS
+
+            SET OP-CRLF           TO TRUE
+            CALL "WSERV" USING W-PARMS 
 
             SET OP-FLUSH-SOCKET   TO TRUE
             CALL "WSERV" USING W-PARMS
