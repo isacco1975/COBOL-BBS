@@ -1,13 +1,20 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. CALLER IS INITIAL PROGRAM.
-
+       PROGRAM-ID. MAIN IS INITIAL PROGRAM.
+ 			 AUTHOR. ISAAC GARCIA PEVERI.
+ 			/
+      * A BBS FOR EVERY TERMINAL
+      * WRITTEN ENTYRELY IN COBOL
+      * C. 2026 IGP TECH BLOG
+      /
        DATA DIVISION.
        WORKING-STORAGE SECTION.
       /
        01 W-PARMS.
           05 SOCK-THREAD        PIC S9(9) COMP-5.
           05 W-DATA             PIC X(40).
+          05 W-FILENAME         PIC X(80).
           05 OPERATION          PIC S9(4) COMP-5.
+             88 OP-SEND-PETSCII            VALUE 1111.
              88 OP-SEND                    VALUE 1000.
              88 OP-RECEIVE                 VALUE 1001.
              88 OP-BUILD-LISTENER          VALUE 1002.
@@ -51,30 +58,45 @@
             
             SET OP-BUILD-SOCKET   TO TRUE
             CALL "WSERV" USING W-PARMS
-            
+           
+            CALL "C$SLEEP" USING 5.
+           
             SET OP-CRSR-CLRHOME   TO TRUE
             CALL "WSERV" USING W-PARMS
 
-            SET OP-SEND           TO TRUE
-            MOVE 'WELCOME TO igp test bbs IN cobol' TO W-DATA
+            SET OP-CRSR-RVSON     TO TRUE
             CALL "WSERV" USING W-PARMS
 
-            SET OP-CRSR-YELLOW   TO TRUE
+            SET OP-SEND-PETSCII   TO TRUE
             CALL "WSERV" USING W-PARMS
 
-            SET OP-SEND           TO TRUE
-            MOVE 'ANOTHER TEXT IN YELLOW' TO W-DATA
-            CALL "WSERV" USING W-PARMS
+      *     SET OP-CRSR-RVSOFF    TO TRUE
+      *     CALL "WSERV" USING W-PARMS
 
-            SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS
+      *     SET OP-SEND           TO TRUE
+      *     MOVE '     WELCOME TO igp test bbs IN cobol' TO W-DATA
+      *     CALL "WSERV" USING W-PARMS
 
-            SET OP-CRSR-LIGHTBLUW TO TRUE
-            CALL "WSERV" USING W-PARMS
+      *     SET OP-CRSR-YELLOW    TO TRUE
+      *     CALL "WSERV" USING W-PARMS
 
-            SET OP-SEND           TO TRUE
-            MOVE 'a package to build your bbs in cobol' TO W-DATA
-            CALL "WSERV" USING W-PARMS
+      *     SET OP-SEND           TO TRUE
+      *     MOVE '     WITH THIS COBOL FRAMEWOEK' TO W-DATA
+      *     CALL "WSERV" USING W-PARMS
+
+      *     SET OP-SEND           TO TRUE
+      *     MOVE '     YOU CAN BUILD YOUR OWN bbs!' TO W-DATA
+      *     CALL "WSERV" USING W-PARMS
+
+      *     SET OP-CRLF           TO TRUE
+      *     CALL "WSERV" USING W-PARMS 
+
+      *     SET OP-CRSR-LIGHTBLUE TO TRUE
+      *     CALL "WSERV" USING W-PARMS
+
+      *     SET OP-SEND           TO TRUE
+      *     MOVE '             --- menu --- ' TO W-DATA
+      *     CALL "WSERV" USING W-PARMS
 
             SET OP-FLUSH-SOCKET   TO TRUE
             CALL "WSERV" USING W-PARMS

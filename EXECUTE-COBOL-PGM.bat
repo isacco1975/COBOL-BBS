@@ -1,2 +1,2 @@
 @echo OFF
-C:\Acucorp\Acucbl700\AcuGT\bin\wrun32 -c "config.txt" .\CALLER.acu
+C:\Acucorp\Acucbl700\AcuGT\bin\wrun32 -c "config.txt" .\MAIN.acu
