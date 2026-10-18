@@ -801,83 +801,6 @@
              05 CP437-VAL PIC 9(3).
              05 CP437-HEX PIC X.
       /
-       01 WS-IGP-LOGO-TABLE.
-      *> --- RIGA 01 ---
-          05 FILLER PIC X(19)
-             VALUE X'A012A000A000A000A000A000A000A000A000A0'.
-          05 FILLER PIC X(19)
-             VALUE X'00A000A000A000A000A000A000A000A000FFFF'.
-      *> --- RIGA 02 ---
-          05 FILLER PIC X(19)
-             VALUE X'A012A000A000A000A000A000A004A004A004A0'.
-          05 FILLER PIC X(19)
-             VALUE X'04A004A000A000A000A000A000A000A000FFFF'.
-      *> --- RIGA 03 ---
-          05 FILLER PIC X(19)
-             VALUE X'A012A000A000A000A004A004A003A003A003A0'.
-          05 FILLER PIC X(19)
-             VALUE X'03A003A004A004A000A000A000A000A000FFFF'.
-      *> --- RIGA 04 ---
-          05 FILLER PIC X(19)
-             VALUE X'A012A000A000A004A003A003A003A006A006A0'.
-          05 FILLER PIC X(19)
-             VALUE X'06A003A003A003A004A000A000A000A000FFFF'.
-      *> --- RIGA 05 ---
-          05 FILLER PIC X(19)
-             VALUE X'A012A000A004A003A003A006A006A006A006A0'.
-          05 FILLER PIC X(19)
-             VALUE X'06A006A006A003A003A004A000A000A000FFFF'.
-      *> --- RIGA 06 ---
-          05 FILLER PIC X(19)
-             VALUE X'A012A000A004A003A006A006A006A006A006A0'.
-          05 FILLER PIC X(19)
-             VALUE X'06A006A006A006A003A004A000A000A000FFFF'.
-      *> --- RIGA 07 ---
-          05 FILLER PIC X(19)
-             VALUE X'A012A004A003A006A006A00DA006A00DA00DA0'.
-          05 FILLER PIC X(19)
-             VALUE X'06A00DA00DA006A003A003A004A000A000FFFF'.
-      *> --- RIGA 08 ---
-          05 FILLER PIC X(19)
-             VALUE X'A012A004A003A006A006A006A00DA006A006A0'.
-          05 FILLER PIC X(19)
-             VALUE X'06A00DA006A00DA006A003A004A000A000FFFF'.
-      *> --- RIGA 09 ---
-          05 FILLER PIC X(19)
-             VALUE X'A012A004A003A006A00DA006A00DA006A00DA0'.
-          05 FILLER PIC X(19)
-             VALUE X'06A00DA00DA006A006A003A004A000A000FFFF'.
-      *> --- RIGA 10 ---
-          05 FILLER PIC X(19)
-             VALUE X'A012A004A003A006A00DA006A006A00DA00DA0'.
-          05 FILLER PIC X(19)
-             VALUE X'06A00DA006A006A006A003A004A000A000FFFF'.
-      *> --- RIGA 11 ---
-          05 FILLER PIC X(19)
-             VALUE X'A012A000A004A003A006A006A006A006A006A0'.
-          05 FILLER PIC X(19)
-             VALUE X'06A006A006A006A003A004A000A000A000FFFF'.
-      *> --- RIGA 12 ---
-          05 FILLER PIC X(19)
-             VALUE X'A012A000A004A003A003A006A006A006A006A0'.
-          05 FILLER PIC X(19)
-             VALUE X'06A006A006A003A003A004A000A000A000FFFF'.
-      *> --- RIGA 13 ---
-          05 FILLER PIC X(19)
-             VALUE X'A012A000A000A004A003A003A006A006A006A0'.
-          05 FILLER PIC X(19)
-             VALUE X'06A003A003A003A004A000A000A000A000FFFF'.
-      *> --- RIGA 14 ---
-          05 FILLER PIC X(19)
-             VALUE X'A012A000A000A000A004A004A003A003A003A0'.
-          05 FILLER PIC X(19)
-             VALUE X'03A003A004A004A000A000A000A000A000FFFF'.
-      *> --- RIGA 15 ---
-          05 FILLER PIC X(19)
-             VALUE X'A012A000A000A000A000A000A004A004A004A0'.
-          05 FILLER PIC X(19)
-             VALUE X'04A004A000A000A000A000A000A000A000FFFF'.
-
        01 INPUT-TEXT  PIC X(80)
           VALUE "hELLO wOLRD - cp437 test".
 
@@ -891,16 +814,16 @@
       /
        01 W-PARMS.
           05 SOCK-THREAD        PIC S9(9) COMP-5.
-          05 W-DATA             PIC X(40).
+          05 W-DATA             PIC X(80).
           05 W-FILENAME         PIC X(80).
           05 OPERATION          PIC S9(4) COMP-5.
-             88 OP-SEND-PETSCII            VALUE 1111.
              88 OP-SEND                    VALUE 1000.
              88 OP-RECEIVE                 VALUE 1001.
              88 OP-BUILD-LISTENER          VALUE 1002.
              88 OP-BUILD-SOCKET            VALUE 1003.
              88 OP-FLUSH-SOCKET            VALUE 1004.
              88 OP-CLOSE-SOCKET            VALUE 1005.
+             88 OP-WAIT-USER               VALUE 1006.
              88 OP-CRSR-CLRHOME            VALUE 147.
              88 OP-CRSR-HOME               VALUE 83.
              88 OP-CRSR-RVSON              VALUE 18.
@@ -926,29 +849,33 @@
              88 OP-CRSR-LIGHTBLUE          VALUE 154.
              88 OP-CRSR-LIGHTGREY          VALUE 155.
              88 OP-CRLF                    VALUE 1310.
+           05 W-RESPONSE PIC X.
+              88 W-RESPONSE-YES VALUE 'Y'.
+              88 W-RESPONSE-NO  VALUE 'N'.
+           05 W-RETURNED-ANSWER PIC X(40).
       /
       /
        PROCEDURE DIVISION USING W-PARMS.
       /*---------------------------------------------------------------*
        MAIN-LOGIC.
             DISPLAY 'WSERV DEBUG> MAIN-LOGIC'
+            SET W-RESPONSE-NO TO TRUE
 
             EVALUATE TRUE
                WHEN OP-CRLF            PERFORM SEND-CRLF
                WHEN OP-SEND            PERFORM SEND-DATA
-               WHEN OP-SEND-PETSCII    PERFORM SEND-PETSCII
-               WHEN OP-RECEIVE         PERFORM READ-DATA
                WHEN OP-BUILD-LISTENER  PERFORM BUILD-LISTENER
                WHEN OP-BUILD-SOCKET    PERFORM ACCEPT-CLIENT
                WHEN OP-FLUSH-SOCKET    PERFORM FLUSH-SOCKET
                WHEN OP-CLOSE-SOCKET    PERFORM DUMMY-PARA
+               WHEN OP-WAIT-USER       PERFORM WAIT-USER
                WHEN OP-CRSR-CLRHOME    PERFORM CLEAR-HOME
                WHEN OP-CRSR-HOME       PERFORM DUMMY-PARA
                WHEN OP-CRSR-RVSON      PERFORM CRSR-RVSON
                WHEN OP-CRSR-RVSOFF     PERFORM CRSR-RVSOFF
-               WHEN OP-CRSR-LEFT       PERFORM DUMMY-PARA
+               WHEN OP-CRSR-LEFT       PERFORM CRSR-LEFT
                WHEN OP-CRSR-RIGHT      PERFORM DUMMY-PARA
-               WHEN OP-CRSR-UP         PERFORM DUMMY-PARA
+               WHEN OP-CRSR-UP         PERFORM CRSR-UP
                WHEN OP-CRSR-DOWN       PERFORM DUMMY-PARA
                WHEN OP-CRSR-BLACK      PERFORM DUMMY-PARA
                WHEN OP-CRSR-WHITE      PERFORM DUMMY-PARA
@@ -1035,6 +962,30 @@
        SEND-CRLF.
             DISPLAY 'DEBUG> SEND-CRLF'
             MOVE X'0D0A' TO FINAL-BUFFER
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-UP.
+            DISPLAY 'DEBUG> CRSR-UP'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 145
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-LEFT.
+            DISPLAY 'DEBUG> CRSR-LEFT'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 157
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
             PERFORM WRITE-SOCKET
             .
       /*---------------------------------------------------------------*
@@ -1150,68 +1101,66 @@
             DISPLAY 'DEBUG> FLUSH-SOCKET'
             CALL "C$SOCKET" USING CSOCKET-FLUSH, CLIENT-SOCKET
             .
-      /*---------------------------------------------------------------*
-       READ-DATA.
-            DISPLAY 'DEBUG> In ascolto tasti in tempo reale dal C64...'
+*---------------------------------------------------------------*
+       WAIT-USER.
+           DISPLAY 'DEBUG> In ascolto tasti in tempo reale dal C64...'
+           MOVE SPACES TO W-RETURNED-ANSWER
+           MOVE 1      TO IDX
 
-            PERFORM UNTIL 1 = 2
+           PERFORM UNTIL 1 = 2
                MOVE 1 TO SOCKET-TIMEOUT
 
                CALL "C$SOCKET" USING CSOCKET-NEXT-READ,
-                                    SERVER-SOCKET,
-                                    SOCKET-TIMEOUT
-                             GIVING READY-SOCKET
+                                     SERVER-SOCKET,
+                                     SOCKET-TIMEOUT
+                          GIVING READY-SOCKET
 
                IF READY-SOCKET > 0
                   IF READY-SOCKET = CLIENT-SOCKET
                      MOVE SPACES TO BUFFER-IN
                      CALL "C$SOCKET" USING CSOCKET-READ,
-                                          CLIENT-SOCKET,
-                                          BUFFER-IN,
-                                          1,
-                                   GIVING BYTES-READ
+                                           CLIENT-SOCKET,
+                                           BUFFER-IN,
+                                           1,
+                                     GIVING BYTES-READ
 
                      IF BYTES-READ > 0
-                         DISPLAY ">>> TASTO RICEVUTO: [" BUFFER-IN(1:1)
-                         "] | Codice ORD: " FUNCTION ORD(BUFFER-IN(1:1))
-      * ................ LOCAL ECHO
-                         CALL "C$SOCKET" USING CSOCKET-WRITE,
-                                        CLIENT-SOCKET,
-                                        BUFFER-IN,
-                                        1,
-                                 GIVING BYTES-SENT
+                        DISPLAY ">>> TASTO RICEVUTO: [" BUFFER-IN(1:1)
+                        "] | Codice ORD: " FUNCTION ORD(BUFFER-IN(1:1))
+
+      * ................ LOCAL ECHO AND BUFFERING
+                        IF BUFFER-IN(1:1) = X'0D'
+                           SET W-RESPONSE-YES TO TRUE
+                           EXIT PERFORM
+                        END-IF
+
+                        IF IDX <= LENGTH OF W-RETURNED-ANSWER
+                           MOVE BUFFER-IN(1:1) 
+                             TO W-RETURNED-ANSWER(IDX:1)
+                           ADD 1 TO IDX
+                        END-IF
+
+                        CALL "C$SOCKET" USING CSOCKET-WRITE,
+                                              CLIENT-SOCKET,
+                                              BUFFER-IN,
+                                              1,
+                                        GIVING BYTES-SENT
                      END-IF
                   END-IF
                END-IF
-            END-PERFORM
-            .
+           END-PERFORM
+           .
       /*---------------------------------------------------------------*
        WRITE-SOCKET.
             DISPLAY 'DEBUG > WRITE-SOCKET'
             MOVE ZERO TO WS-COUNT
 
             INSPECT FINAL-BUFFER
-                    REPLACING TRAILING SPACES BY LOW-VALUES
+                    REPLACING TRAILING SPACES BY HIGH-VALUES
             INSPECT FINAL-BUFFER
-                    TALLYING WS-COUNT FOR CHARACTERS BEFORE LOW-VALUES
+                    TALLYING WS-COUNT FOR CHARACTERS BEFORE HIGH-VALUES
 
-            COMPUTE MSG-LEN = WS-COUNT + 1
-
-            CALL "C$SOCKET" USING CSOCKET-WRITE,
-                                 CLIENT-SOCKET,
-                                 FINAL-BUFFER,
-                                 MSG-LEN
-                          GIVING BYTES-SENT
-
-            IF BYTES-SENT > 0
-                DISPLAY "Bytes SENT: " BYTES-SENT
-            END-IF
-            .
-      /*---------------------------------------------------------------*
-       SEND-PETSCII.
-            DISPLAY 'DEBUG > SEND-PETSCII'
-            MOVE WS-IGP-LOGO-TABLE TO FINAL-BUFFER
-            MOVE LENGTH OF WS-IGP-LOGO-TABLE TO MSG-LEN
+            COMPUTE MSG-LEN = WS-COUNT
 
             CALL "C$SOCKET" USING CSOCKET-WRITE,
                                  CLIENT-SOCKET,

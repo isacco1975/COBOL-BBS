@@ -1,7 +1,7 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. MAIN IS INITIAL PROGRAM.
- 			 AUTHOR. ISAAC GARCIA PEVERI.
- 			/
+       AUTHOR. ISAAC GARCIA PEVERI.
+      /
       * A BBS FOR EVERY TERMINAL
       * WRITTEN ENTYRELY IN COBOL
       * C. 2026 IGP TECH BLOG
@@ -11,16 +11,15 @@
       /
        01 W-PARMS.
           05 SOCK-THREAD        PIC S9(9) COMP-5.
-          05 W-DATA             PIC X(40).
+          05 W-DATA             PIC X(80).
           05 W-FILENAME         PIC X(80).
           05 OPERATION          PIC S9(4) COMP-5.
-             88 OP-SEND-PETSCII            VALUE 1111.
              88 OP-SEND                    VALUE 1000.
-             88 OP-RECEIVE                 VALUE 1001.
              88 OP-BUILD-LISTENER          VALUE 1002.
              88 OP-BUILD-SOCKET            VALUE 1003.
              88 OP-FLUSH-SOCKET            VALUE 1004.
              88 OP-CLOSE-SOCKET            VALUE 1005.
+             88 OP-WAIT-USER               VALUE 1006.
              88 OP-CRSR-CLRHOME            VALUE 147.
              88 OP-CRSR-HOME               VALUE 83.
              88 OP-CRSR-RVSON              VALUE 18.
@@ -46,7 +45,84 @@
              88 OP-CRSR-LIGHTBLUE          VALUE 154.
              88 OP-CRSR-LIGHTGREY          VALUE 155.
              88 OP-CRLF                    VALUE 1310.
-      / 
+          05 W-RESPONSE PIC X.
+             88 W-RESPONSE-YES VALUE 'Y'.
+             88 W-RESPONSE-NO  VALUE 'N'.
+           05 W-RETURNED-ANSWER PIC X(40).
+      /
+       01 WS-IGP-LOGO-TABLE.
+      *> --- RIGA 01 ---
+          05 FILLER PIC X(19)
+             VALUE X'20902090209020902090209020902090209020'.
+          05 FILLER PIC X(19)
+             VALUE X'90209020902090209020902090209020902090'.
+      *> --- RIGA 02 ---
+          05 FILLER PIC X(19)
+             VALUE X'20902090209020902090209020902090209020'.
+          05 FILLER PIC X(19)
+             VALUE X'90209020902090209020902090209020902090'.
+      *> --- RIGA 03 ---
+          05 FILLER PIC X(19)
+             VALUE X'20902090209020902090209020902090209020'.
+          05 FILLER PIC X(19)
+             VALUE X'902090209E209E209E20902090209620962096'.
+      *> --- RIGA 04 ---
+          05 FILLER PIC X(19)
+             VALUE X'20902090209F209F209020902090209A209A20'.
+          05 FILLER PIC X(19)
+             VALUE X'9A209020902099209020902090209020902090'.
+      *> --- RIGA 05 ---
+          05 FILLER PIC X(19)
+             VALUE X'20902090209020902090209020902090209020'.
+          05 FILLER PIC X(19)
+             VALUE X'9020902090209E209020902090209020962090'.
+      *> --- RIGA 06 ---
+          05 FILLER PIC X(19)
+             VALUE X'2090209020962090209F2090209F2090209A20'.
+          05 FILLER PIC X(19)
+             VALUE X'9020902090209A209020992090209020902090'.
+      *> --- RIGA 07 ---
+          05 FILLER PIC X(19)
+             VALUE X'20902090209020902090209020902090209020'.
+          05 FILLER PIC X(19)
+             VALUE X'902090209020902090209E2090209020902090'.
+      *> --- RIGA 08 ---
+          05 FILLER PIC X(19)
+             VALUE X'209620902090209020962090209F209F209F20'.
+          05 FILLER PIC X(19)
+             VALUE X'90209A209020902090209A2090209920902090'.
+      *> --- RIGA 09 ---
+          05 FILLER PIC X(19)
+             VALUE X'20902090209020902090209020902090209020'.
+          05 FILLER PIC X(19)
+             VALUE X'90209020902090209020902090209E20902090'.
+      *> --- RIGA 10 ---
+          05 FILLER PIC X(19)
+             VALUE X'20902090209620902090209020962090209F20'.
+          05 FILLER PIC X(19)
+             VALUE X'90209F2090209A209020902090209A20902099'.
+      *> --- RIGA 11 ---
+          05 FILLER PIC X(19)
+             VALUE X'20902090209020902090209020902090209020'.
+          05 FILLER PIC X(19)
+             VALUE X'90209020902090209020902090209020902090'.
+      *> --- RIGA 12 ---
+          05 FILLER PIC X(19)
+             VALUE X'209E209E209E20902090209620962096209020'.
+          05 FILLER PIC X(19)
+             VALUE X'90209F209F209020902090209A209A209A2090'.
+      *> --- RIGA 13 ---
+          05 FILLER PIC X(19)
+             VALUE X'20902099209920992099209020902090209020'.
+          05 FILLER PIC X(19)
+             VALUE X'9020902090'.
+
+       01 WS-IGP-LOGO REDEFINES WS-IGP-LOGO-TABLE.
+          05 WS-LOGO-ROW OCCURS 13 TIMES.
+             10 WS-ROW-PART1 PIC X(19).
+             10 WS-ROW-PART2 PIC X(19).
+
+       77 IDX PIC S9(4) COMP VALUE 0.
       /
        PROCEDURE DIVISION.
       /*---------------------------------------------------------------*
@@ -55,31 +131,36 @@
 
             SET OP-BUILD-LISTENER TO TRUE
             CALL "WSERV" USING W-PARMS
-            
+
             SET OP-BUILD-SOCKET   TO TRUE
             CALL "WSERV" USING W-PARMS
-                     
+
+            CALL "C$SLEEP" USING 3
+
             SET OP-CRSR-CLRHOME   TO TRUE
             CALL "WSERV" USING W-PARMS
 
-      *      SET OP-CRSR-RVSON     TO TRUE
-      *      CALL "WSERV" USING W-PARMS
+            SET OP-CRSR-RVSON     TO TRUE
+            CALL "WSERV" USING W-PARMS
 
-      *      SET OP-SEND-PETSCII   TO TRUE
-      *      CALL "WSERV" USING W-PARMS
+            PERFORM VARYING IDX FROM 1 BY 1 UNTIL IDX > 13
+                SET OP-SEND           TO TRUE
+                MOVE WS-LOGO-ROW(IDX) TO W-DATA
+                CALL "WSERV" USING W-PARMS
+            END-PERFORM
 
-      *      SET OP-CRSR-RVSOFF    TO TRUE
-      *      CALL "WSERV" USING W-PARMS
+            SET OP-CRSR-RVSOFF    TO TRUE
+            CALL "WSERV" USING W-PARMS
 
             SET OP-SEND           TO TRUE
             MOVE '     WELCOME TO igp test bbs IN cobol' TO W-DATA
             CALL "WSERV" USING W-PARMS
 
             SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS 
+            CALL "WSERV" USING W-PARMS
 
             SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS 
+            CALL "WSERV" USING W-PARMS
 
             SET OP-CRSR-YELLOW    TO TRUE
             CALL "WSERV" USING W-PARMS
@@ -89,17 +170,17 @@
             CALL "WSERV" USING W-PARMS
 
             SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS 
+            CALL "WSERV" USING W-PARMS
 
             SET OP-SEND           TO TRUE
             MOVE '     YOU CAN BUILD YOUR OWN bbs!' TO W-DATA
             CALL "WSERV" USING W-PARMS
 
             SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS 
+            CALL "WSERV" USING W-PARMS
 
             SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS 
+            CALL "WSERV" USING W-PARMS
 
             SET OP-CRSR-LIGHTBLUE TO TRUE
             CALL "WSERV" USING W-PARMS
@@ -109,26 +190,53 @@
             CALL "WSERV" USING W-PARMS
 
             SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS 
+            CALL "WSERV" USING W-PARMS
 
             SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS 
+            CALL "WSERV" USING W-PARMS
 
             SET OP-CRSR-LIGHTGREEN TO TRUE
             CALL "WSERV" USING W-PARMS
 
             SET OP-SEND           TO TRUE
-            MOVE '   1. pAGE #1 ' TO W-DATA
+            MOVE '       pLEASE TELL US your name: ' TO W-DATA
             CALL "WSERV" USING W-PARMS
 
             SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS 
-
-            MOVE '   2. pAGE #2 ' TO W-DATA
             CALL "WSERV" USING W-PARMS
 
             SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS 
+            CALL "WSERV" USING W-PARMS
+
+            SET OP-SEND           TO TRUE
+            MOVE ' >  ' TO W-DATA
+            CALL "WSERV" USING W-PARMS
+
+            SET OP-WAIT-USER      TO TRUE
+            CALL "WSERV" USING W-PARMS
+
+            IF W-RESPONSE-YES
+      ***         CALL "PAGE2"
+                SET OP-CRLF           TO TRUE
+                CALL "WSERV" USING W-PARMS
+
+                SET OP-CRLF           TO TRUE
+                CALL "WSERV" USING W-PARMS
+
+                SET OP-CRSR-YELLOW    TO TRUE
+                CALL "WSERV" USING W-PARMS
+
+                INSPECT W-RETURNED-ANSWER 
+                        REPLACING TRAILING SPACES BY LOW-VALUES
+
+                SET OP-SEND           TO TRUE
+                STRING ' HELLO ' 
+                        DELIMITED SIZE 
+                        W-RETURNED-ANSWER DELIMITED LOW-VALUE
+                        ' WELCOME TO COBOL BBS'
+                    INTO W-DATA
+                CALL "WSERV" USING W-PARMS
+            END-IF
 
             SET OP-FLUSH-SOCKET   TO TRUE
             CALL "WSERV" USING W-PARMS
