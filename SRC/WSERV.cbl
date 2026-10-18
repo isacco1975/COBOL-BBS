@@ -878,7 +878,7 @@
                WHEN OP-CRSR-UP         PERFORM CRSR-UP
                WHEN OP-CRSR-DOWN       PERFORM DUMMY-PARA
                WHEN OP-CRSR-BLACK      PERFORM DUMMY-PARA
-               WHEN OP-CRSR-WHITE      PERFORM DUMMY-PARA
+               WHEN OP-CRSR-WHITE      PERFORM CRSR-WHITE
                WHEN OP-CRSR-RED        PERFORM DUMMY-PARA
                WHEN OP-CRSR-CYAN       PERFORM DUMMY-PARA
                WHEN OP-CRSR-PURPLE     PERFORM DUMMY-PARA
@@ -962,6 +962,18 @@
        SEND-CRLF.
             DISPLAY 'DEBUG> SEND-CRLF'
             MOVE X'0D0A' TO FINAL-BUFFER
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-WHITE.
+            DISPLAY 'DEBUG> CRSR-WHITE'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 5
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
             PERFORM WRITE-SOCKET
             .
       /*---------------------------------------------------------------*
