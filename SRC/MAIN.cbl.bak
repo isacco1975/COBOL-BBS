@@ -137,123 +137,156 @@
        PROCEDURE DIVISION.
       /*---------------------------------------------------------------*
        MAIN-LOGIC.
-            DISPLAY 'DEBUG> MAIN-LOGIC'
+           DISPLAY 'DEBUG> MAIN-LOGIC - Avvio Server BBS...'
 
-            SET OP-BUILD-LISTENER TO TRUE
-            CALL "WSERV" USING W-PARMS
+           SET OP-BUILD-LISTENER TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-BUILD-SOCKET   TO TRUE
-            CALL "WSERV" USING W-PARMS
+           PERFORM UNTIL 1 = 2
+              DISPLAY 'DEBUG> In attesa di un nuovo client...'
+              
+              CALL "C$SLEEP" USING 3
+              SET OP-BUILD-SOCKET TO TRUE
+              CALL "WSERV" USING W-PARMS
 
-            CALL "C$SLEEP" USING 3
+              PERFORM HANDLE-CLIENT-SESSION
 
-            SET OP-CRSR-CLRHOME   TO TRUE
-            CALL "WSERV" USING W-PARMS
+              SET OP-CLOSE-SOCKET TO TRUE
+              CALL "WSERV" USING W-PARMS
+           END-PERFORM
+           .
 
-            SET OP-CRSR-RVSON     TO TRUE
-            CALL "WSERV" USING W-PARMS
+      *---------------------------------------------------------------*
+       HANDLE-CLIENT-SESSION.
+           CALL "C$SLEEP" USING 0.2
+           SET OP-CRSR-CLRHOME TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            PERFORM VARYING IDX FROM 1 BY 1 UNTIL IDX > 15
-                SET OP-SEND           TO TRUE
-                MOVE WS-LOGO-ROW(IDX) TO W-DATA
-                CALL "WSERV" USING W-PARMS
-            END-PERFORM
+           CALL "C$SLEEP" USING 0.2
+           SET OP-CRSR-RVSON TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-CRSR-WHITE TO TRUE
-            CALL "WSERV" USING W-PARMS
+           PERFORM VARYING IDX FROM 1 BY 1 UNTIL IDX > 15
+              SET OP-SEND TO TRUE
+              CALL "C$SLEEP" USING 0.2
+              MOVE WS-LOGO-ROW(IDX) TO W-DATA
+              CALL "WSERV" USING W-PARMS
+           END-PERFORM
 
-            SET OP-SEND           TO TRUE
-            MOVE '     WELCOME TO igp test bbs IN cobol' TO W-DATA
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-CRSR-RVSOFF TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-CRSR-RVSOFF    TO TRUE
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-CRSR-WHITE TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-SEND TO TRUE
+           MOVE '     WELCOME TO igp test bbs IN cobol' TO W-DATA
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-CRLF TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-CRSR-YELLOW    TO TRUE
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-CRLF TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-SEND           TO TRUE
-            MOVE '     WITH THIS COBOL FRAMEWOEK' TO W-DATA
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-CRSR-YELLOW TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-SEND TO TRUE
+           MOVE '     WITH THIS COBOL FRAMEWORK' TO W-DATA
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-SEND           TO TRUE
-            MOVE '     YOU CAN BUILD YOUR OWN bbs!' TO W-DATA
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-CRLF TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-SEND TO TRUE
+           MOVE '     YOU CAN BUILD YOUR OWN bbs!' TO W-DATA
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-CRLF TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-CRSR-LIGHTBLUE TO TRUE
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-CRLF TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-SEND           TO TRUE
-            MOVE '             --- menu --- ' TO W-DATA
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-CRSR-LIGHTBLUE TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-SEND TO TRUE
+           MOVE '            --- question --- ' TO W-DATA
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-CRLF TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-CRSR-LIGHTGREEN TO TRUE
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-CRLF TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-SEND           TO TRUE
-            MOVE '       pLEASE TELL US your name: ' TO W-DATA
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-SEND TO TRUE
+           MOVE '     PLEASE TELL US YOUR NAME: ' TO W-DATA
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-CRLF TO TRUE
+           CALL "WSERV" USING W-PARMS
+           SET OP-CRLF TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-CRLF           TO TRUE
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-CRSR-LIGHTGREEN TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-SEND           TO TRUE
-            MOVE ' >  ' TO W-DATA
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-SEND TO TRUE
+           MOVE ' >  ' TO W-DATA
+           CALL "WSERV" USING W-PARMS
 
-            SET OP-WAIT-USER      TO TRUE
-            CALL "WSERV" USING W-PARMS
+           CALL "C$SLEEP" USING 0.2
+           SET OP-WAIT-USER TO TRUE
+           CALL "WSERV" USING W-PARMS
 
-            IF W-RESPONSE-YES
-      ***         CALL "PAGE2"
-                SET OP-CRLF           TO TRUE
-                CALL "WSERV" USING W-PARMS
+           IF W-RESPONSE-YES
+              CALL "C$SLEEP" USING 0.2
+              SET OP-CRLF TO TRUE
+              CALL "WSERV" USING W-PARMS
 
-                SET OP-CRLF           TO TRUE
-                CALL "WSERV" USING W-PARMS
+              CALL "C$SLEEP" USING 0.2
+              SET OP-CRLF TO TRUE
+              CALL "WSERV" USING W-PARMS
 
-                SET OP-CRSR-YELLOW    TO TRUE
-                CALL "WSERV" USING W-PARMS
+              CALL "C$SLEEP" USING 0.2
+              SET OP-CRSR-YELLOW TO TRUE
+              CALL "WSERV" USING W-PARMS
 
-                INSPECT W-RETURNED-ANSWER 
-                        REPLACING TRAILING SPACES BY LOW-VALUES
+              MOVE SPACES TO W-DATA
+              
+              STRING 'HELLO ' DELIMITED BY SIZE
+                     W-RETURNED-ANSWER DELIMITED BY SPACES
+                     ' WELCOME TO COBOL BBS' DELIMITED BY SIZE
+                INTO W-DATA
+              
+              CALL "C$SLEEP" USING 0.2
+              SET OP-SEND TO TRUE
+              CALL "WSERV" USING W-PARMS
+           END-IF
 
-                SET OP-SEND           TO TRUE
-                STRING ' HELLO ' 
-                        DELIMITED SIZE 
-                        W-RETURNED-ANSWER DELIMITED LOW-VALUE
-                        ' WELCOME TO COBOL BBS'
-                    INTO W-DATA
-                CALL "WSERV" USING W-PARMS
-            END-IF
-
-            SET OP-FLUSH-SOCKET   TO TRUE
-            CALL "WSERV" USING W-PARMS
-
-            ACCEPT OMITTED
-            STOP RUN
-            .
+           CALL "C$SLEEP" USING 0.2
+           SET OP-FLUSH-SOCKET TO TRUE
+           CALL "WSERV" USING W-PARMS
+           .

@@ -12,7 +12,7 @@
        78  CSOCKET-NEXT-READ        VALUE 11.
        78  CSOCKET-FLUSH            VALUE 7.
 
-       77  SERVER-PORT              PIC 9(5)    COMP-5 VALUE 64000.
+       77  SERVER-PORT              PIC 9(5)    COMP-5 VALUE 64738.
        77  SERVER-SOCKET            PIC S9(9)   COMP-5 VALUE 0.
        77  CLIENT-SOCKET            PIC S9(9)   COMP-5 VALUE 0.
        77  RETURN-CODE-SOCKET       PIC S9(9)   COMP-5 VALUE 0.
