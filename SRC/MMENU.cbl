@@ -43,7 +43,7 @@
            CALL "WSERV" USING W-PARMS
 
            SET OP-SEND TO TRUE
-           MOVE '     pLEASE SELECT AN OPTION: ' TO W-DATA
+           MOVE '     PLEASE SELECT AN OPTION: ' TO W-DATA
            CALL "WSERV" USING W-PARMS
 
            SET OP-CRLF TO TRUE
@@ -53,17 +53,21 @@
            CALL "WSERV" USING W-PARMS
 
            SET OP-SEND TO TRUE
-           MOVE ' 1. Page A ' TO W-DATA
+           MOVE ' 1. PAGE a ' TO W-DATA
            CALL "WSERV" USING W-PARMS
 
            SET OP-CRLF TO TRUE
            CALL "WSERV" USING W-PARMS
 
            SET OP-SEND TO TRUE
-           MOVE ' 2. Page B ' TO W-DATA
+           MOVE ' 2. PAGE b ' TO W-DATA
            CALL "WSERV" USING W-PARMS
 
            SET OP-CRLF TO TRUE
+           CALL "WSERV" USING W-PARMS
+
+           SET OP-SEND TO TRUE
+           MOVE ' > ' TO W-DATA
            CALL "WSERV" USING W-PARMS
 
            SET OP-WAIT-USER TO TRUE

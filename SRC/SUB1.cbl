@@ -32,6 +32,6 @@
            CALL "WSERV" USING W-PARMS
 
            SET OP-SEND TO TRUE
-           MOVE ' THIS IS PAGE SUB 1 ' TO W-DATA
+           MOVE ' THIS IS PAGE A (SUB 1) ' TO W-DATA
            CALL "WSERV" USING W-PARMS
            .
