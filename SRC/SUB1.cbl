@@ -34,4 +34,26 @@
            SET OP-SEND TO TRUE
            MOVE ' THIS IS PAGE A (SUB 1) ' TO W-DATA
            CALL "WSERV" USING W-PARMS
+           
+           SET OP-CRLF TO TRUE
+           CALL "WSERV" USING W-PARMS
+
+           SET OP-CRSR-YELLOW TO TRUE
+           CALL "WSERV" USING W-PARMS
+
+           SET OP-SEND TO TRUE
+           MOVE ' ENTER x = GO BACK TO MENU ' TO W-DATA
+           CALL "WSERV" USING W-PARMS
+
+           SET OP-CRLF TO TRUE
+           CALL "WSERV" USING W-PARMS
+
+           SET OP-WAIT-USER TO TRUE
+           CALL "WSERV" USING W-PARMS
+
+           IF W-RESPONSE-YES
+              IF W-RETURNED-ANSWER(1:1) = 'x' or 'X'
+                 GOBACK
+              END-IF
+           END-IF
            .

@@ -17,7 +17,11 @@
        PROCEDURE DIVISION USING WPARMS.
       /*---------------------------------------------------------------*
        MAIN-LOGIC.
-           PERFORM HANDLE-CLIENT-SESSION
+           PERFORM UNTIL W-RETURNED-ANSWER(1:1) = 'X' 
+              OR W-RETURNED-ANSWER(1:1) = 'x' 
+                 PERFORM HANDLE-CLIENT-SESSION
+           END-PERFORM
+                 
            GOBACK
            .
       /*---------------------------------------------------------------*
