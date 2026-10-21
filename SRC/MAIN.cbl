@@ -217,8 +217,6 @@
                      ' WELCOME TO COBOL BBS' DELIMITED BY SIZE
                 INTO W-DATA
 
-               STOP "X"
-
                MOVE "MMENU" TO WS-PGMNAME
                CALL WS-PGMNAME USING W-PARMS
            END-IF

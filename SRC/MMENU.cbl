@@ -17,7 +17,6 @@
        PROCEDURE DIVISION USING WPARMS.
       /*---------------------------------------------------------------*
        MAIN-LOGIC.
-           STOP "X"
            PERFORM HANDLE-CLIENT-SESSION
            GOBACK
            .
