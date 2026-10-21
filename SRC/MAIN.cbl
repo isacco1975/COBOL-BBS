@@ -92,8 +92,9 @@
           05 WS-LOGO-ROW OCCURS 15 TIMES.
              10 WS-ROW-PART1 PIC X(19).
              10 WS-ROW-PART2 PIC X(19).
-             
-       77 IDX PIC S9(4) COMP VALUE 0.
+
+       77 IDX PIC S9(4)  COMP VALUE 0.
+       77 WS-PGMNAME PIC X(8) VALUE SPACES.
       /
        PROCEDURE DIVISION.
       /*---------------------------------------------------------------*
@@ -105,7 +106,7 @@
 
            PERFORM UNTIL 1 = 2
               DISPLAY 'DEBUG> In attesa di un nuovo client...'
-              
+
               SET OP-BUILD-SOCKET TO TRUE
               CALL "WSERV" USING W-PARMS
 
@@ -210,13 +211,16 @@
               CALL "WSERV" USING W-PARMS
 
               MOVE SPACES TO W-DATA
-              
+
               STRING 'HELLO ' DELIMITED BY SIZE
                      W-RETURNED-ANSWER DELIMITED BY SPACES
                      ' WELCOME TO COBOL BBS' DELIMITED BY SIZE
                 INTO W-DATA
-              
-               CALL "MMENU" USING W-PARMS
+
+               STOP "X"
+
+               MOVE "MMENU" TO WS-PGMNAME
+               CALL WS-PGMNAME USING W-PARMS
            END-IF
 
            SET OP-FLUSH-SOCKET TO TRUE

@@ -1074,10 +1074,11 @@
             DISPLAY 'DEBUG> FLUSH-SOCKET'
             CALL "C$SOCKET" USING CSOCKET-FLUSH, CLIENT-SOCKET
             .
-*---------------------------------------------------------------*
+      /*---------------------------------------------------------------*
        WAIT-USER.
            DISPLAY 'DEBUG> In ascolto tasti in tempo reale dal C64...'
            MOVE SPACES TO W-RETURNED-ANSWER
+           SET W-RESPONSE-NO TO TRUE
            MOVE 1      TO IDX
 
            PERFORM UNTIL 1 = 2
@@ -1108,7 +1109,7 @@
                         END-IF
 
                         IF IDX <= LENGTH OF W-RETURNED-ANSWER
-                           MOVE BUFFER-IN(1:1) 
+                           MOVE BUFFER-IN(1:1)
                              TO W-RETURNED-ANSWER(IDX:1)
                            ADD 1 TO IDX
                         END-IF
