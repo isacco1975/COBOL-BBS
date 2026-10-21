@@ -244,7 +244,7 @@
       *        CALL "C$SLEEP" USING 0.2
       *        SET OP-SEND TO TRUE
       *        CALL "WSERV" USING W-PARMS\
-               CALL "PAGE2" USING W-PARMS
+               CALL "MMENU" USING W-PARMS
            END-IF
 
            CALL "C$SLEEP" USING 0.2

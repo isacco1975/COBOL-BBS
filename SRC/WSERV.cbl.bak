@@ -1,0 +1,1145 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. WSERV IS RESIDENT PROGRAM.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       78  CSOCKET-CREATE-SERVER    VALUE 1.
+       78  CSOCKET-ACCEPT           VALUE 2.
+       78  CSOCKET-CLOSE            VALUE 4.
+       78  CSOCKET-CREATE-CLIENT    VALUE 3.
+       78  CSOCKET-WRITE            VALUE 5.
+       78  CSOCKET-READ             VALUE 6.
+       78  CSOCKET-NEXT-READ        VALUE 11.
+       78  CSOCKET-FLUSH            VALUE 7.
+
+       77  SERVER-PORT              PIC 9(5)    COMP-5 VALUE 64738.
+       77  SERVER-SOCKET            PIC S9(9)   COMP-5 VALUE 0.
+       77  CLIENT-SOCKET            PIC S9(9)   COMP-5 VALUE 0.
+       77  RETURN-CODE-SOCKET       PIC S9(9)   COMP-5 VALUE 0.
+       77  BUFFER-IN                PIC X(1024)        VALUE SPACES.
+       77  BUFFER-OUT               PIC X(80)          VALUE SPACES.
+       77  BYTES-READ               PIC S9(9)   COMP-5 VALUE 0.
+       77  FINAL-BUFFER             PIC X(2000)        VALUE SPACES.
+       77  BYTES-SENT               PIC S9(9)   COMP-5 VALUE 0.
+       77  MSG-LEN                  PIC S9(9)   COMP-5 VALUE 0.
+       77  SOCKET-TIMEOUT           PIC S9(9)   COMP-5 VALUE 1.
+       77  READY-SOCKET             PIC S9(9)   COMP-5 VALUE 0.
+
+      * PETSCII C64 TABLE (00H - FFH / 000 - 255)
+       01 PETSCII-TABLE.
+          05 FILLER.
+             10 PIC 9(3) VALUE 000.
+             10 PIC X VALUE X'00'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 001.
+             10 PIC X VALUE X'01'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 002.
+             10 PIC X VALUE X'02'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 003.
+             10 PIC X VALUE X'03'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 004.
+             10 PIC X VALUE X'04'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 005.
+             10 PIC X VALUE X'05'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 006.
+             10 PIC X VALUE X'06'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 007.
+             10 PIC X VALUE X'07'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 008.
+             10 PIC X VALUE X'08'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 009.
+             10 PIC X VALUE X'09'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 010.
+             10 PIC X VALUE X'0A'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 011.
+             10 PIC X VALUE X'0B'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 012.
+             10 PIC X VALUE X'0C'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 013.
+             10 PIC X VALUE X'0D'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 014.
+             10 PIC X VALUE X'0E'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 015.
+             10 PIC X VALUE X'0F'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 016.
+             10 PIC X VALUE X'10'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 017.
+             10 PIC X VALUE X'11'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 018.
+             10 PIC X VALUE X'12'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 019.
+             10 PIC X VALUE X'13'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 020.
+             10 PIC X VALUE X'14'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 021.
+             10 PIC X VALUE X'15'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 022.
+             10 PIC X VALUE X'16'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 023.
+             10 PIC X VALUE X'17'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 024.
+             10 PIC X VALUE X'18'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 025.
+             10 PIC X VALUE X'19'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 026.
+             10 PIC X VALUE X'1A'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 027.
+             10 PIC X VALUE X'1B'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 028.
+             10 PIC X VALUE X'1C'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 029.
+             10 PIC X VALUE X'1D'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 030.
+             10 PIC X VALUE X'1E'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 031.
+             10 PIC X VALUE X'1F'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 032.
+             10 PIC X VALUE X'20'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 033.
+             10 PIC X VALUE X'21'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 034.
+             10 PIC X VALUE X'22'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 035.
+             10 PIC X VALUE X'23'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 036.
+             10 PIC X VALUE X'24'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 037.
+             10 PIC X VALUE X'25'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 038.
+             10 PIC X VALUE X'26'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 039.
+             10 PIC X VALUE X'27'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 040.
+             10 PIC X VALUE X'28'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 041.
+             10 PIC X VALUE X'29'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 042.
+             10 PIC X VALUE X'2A'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 043.
+             10 PIC X VALUE X'2B'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 044.
+             10 PIC X VALUE X'2C'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 045.
+             10 PIC X VALUE X'2D'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 046.
+             10 PIC X VALUE X'2E'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 047.
+             10 PIC X VALUE X'2F'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 048.
+             10 PIC X VALUE X'30'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 049.
+             10 PIC X VALUE X'31'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 050.
+             10 PIC X VALUE X'32'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 051.
+             10 PIC X VALUE X'33'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 052.
+             10 PIC X VALUE X'34'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 053.
+             10 PIC X VALUE X'35'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 054.
+             10 PIC X VALUE X'36'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 055.
+             10 PIC X VALUE X'37'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 056.
+             10 PIC X VALUE X'38'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 057.
+             10 PIC X VALUE X'39'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 058.
+             10 PIC X VALUE X'3A'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 059.
+             10 PIC X VALUE X'3B'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 060.
+             10 PIC X VALUE X'3C'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 061.
+             10 PIC X VALUE X'3D'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 062.
+             10 PIC X VALUE X'3E'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 063.
+             10 PIC X VALUE X'3F'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 064.
+             10 PIC X VALUE X'40'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 065.
+             10 PIC X VALUE X'41'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 066.
+             10 PIC X VALUE X'42'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 067.
+             10 PIC X VALUE X'43'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 068.
+             10 PIC X VALUE X'44'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 069.
+             10 PIC X VALUE X'45'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 070.
+             10 PIC X VALUE X'46'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 071.
+             10 PIC X VALUE X'47'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 072.
+             10 PIC X VALUE X'48'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 073.
+             10 PIC X VALUE X'49'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 074.
+             10 PIC X VALUE X'4A'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 075.
+             10 PIC X VALUE X'4B'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 076.
+             10 PIC X VALUE X'4C'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 077.
+             10 PIC X VALUE X'4D'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 078.
+             10 PIC X VALUE X'4E'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 079.
+             10 PIC X VALUE X'4F'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 080.
+             10 PIC X VALUE X'50'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 081.
+             10 PIC X VALUE X'51'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 082.
+             10 PIC X VALUE X'52'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 083.
+             10 PIC X VALUE X'53'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 084.
+             10 PIC X VALUE X'54'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 085.
+             10 PIC X VALUE X'55'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 086.
+             10 PIC X VALUE X'56'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 087.
+             10 PIC X VALUE X'57'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 088.
+             10 PIC X VALUE X'58'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 089.
+             10 PIC X VALUE X'59'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 090.
+             10 PIC X VALUE X'5A'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 091.
+             10 PIC X VALUE X'5B'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 092.
+             10 PIC X VALUE X'5C'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 093.
+             10 PIC X VALUE X'5D'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 094.
+             10 PIC X VALUE X'5E'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 095.
+             10 PIC X VALUE X'5F'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 096.
+             10 PIC X VALUE X'60'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 097.
+             10 PIC X VALUE X'61'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 098.
+             10 PIC X VALUE X'62'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 099.
+             10 PIC X VALUE X'63'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 100.
+             10 PIC X VALUE X'64'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 101.
+             10 PIC X VALUE X'65'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 102.
+             10 PIC X VALUE X'66'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 103.
+             10 PIC X VALUE X'67'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 104.
+             10 PIC X VALUE X'68'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 105.
+             10 PIC X VALUE X'69'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 106.
+             10 PIC X VALUE X'6A'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 107.
+             10 PIC X VALUE X'6B'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 108.
+             10 PIC X VALUE X'6C'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 109.
+             10 PIC X VALUE X'6D'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 110.
+             10 PIC X VALUE X'6E'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 111.
+             10 PIC X VALUE X'6F'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 112.
+             10 PIC X VALUE X'70'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 113.
+             10 PIC X VALUE X'71'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 114.
+             10 PIC X VALUE X'72'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 115.
+             10 PIC X VALUE X'73'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 116.
+             10 PIC X VALUE X'74'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 117.
+             10 PIC X VALUE X'75'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 118.
+             10 PIC X VALUE X'76'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 119.
+             10 PIC X VALUE X'77'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 120.
+             10 PIC X VALUE X'78'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 121.
+             10 PIC X VALUE X'79'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 122.
+             10 PIC X VALUE X'7A'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 123.
+             10 PIC X VALUE X'7B'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 124.
+             10 PIC X VALUE X'7C'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 125.
+             10 PIC X VALUE X'7D'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 126.
+             10 PIC X VALUE X'7E'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 127.
+             10 PIC X VALUE X'7F'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 128.
+             10 PIC X VALUE X'80'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 129.
+             10 PIC X VALUE X'81'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 130.
+             10 PIC X VALUE X'82'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 131.
+             10 PIC X VALUE X'83'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 132.
+             10 PIC X VALUE X'84'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 133.
+             10 PIC X VALUE X'85'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 134.
+             10 PIC X VALUE X'86'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 135.
+             10 PIC X VALUE X'87'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 136.
+             10 PIC X VALUE X'88'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 137.
+             10 PIC X VALUE X'89'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 138.
+             10 PIC X VALUE X'8A'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 139.
+             10 PIC X VALUE X'8B'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 140.
+             10 PIC X VALUE X'8C'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 141.
+             10 PIC X VALUE X'8D'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 142.
+             10 PIC X VALUE X'8E'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 143.
+             10 PIC X VALUE X'8F'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 144.
+             10 PIC X VALUE X'90'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 145.
+             10 PIC X VALUE X'91'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 146.
+             10 PIC X VALUE X'92'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 147.
+             10 PIC X VALUE X'93'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 148.
+             10 PIC X VALUE X'94'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 149.
+             10 PIC X VALUE X'95'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 150.
+             10 PIC X VALUE X'96'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 151.
+             10 PIC X VALUE X'97'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 152.
+             10 PIC X VALUE X'98'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 153.
+             10 PIC X VALUE X'99'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 154.
+             10 PIC X VALUE X'9A'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 155.
+             10 PIC X VALUE X'9B'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 156.
+             10 PIC X VALUE X'9C'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 157.
+             10 PIC X VALUE X'9D'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 158.
+             10 PIC X VALUE X'9E'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 159.
+             10 PIC X VALUE X'9F'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 160.
+             10 PIC X VALUE X'A0'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 161.
+             10 PIC X VALUE X'A1'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 162.
+             10 PIC X VALUE X'A2'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 163.
+             10 PIC X VALUE X'A3'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 164.
+             10 PIC X VALUE X'A4'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 165.
+             10 PIC X VALUE X'A5'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 166.
+             10 PIC X VALUE X'A6'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 167.
+             10 PIC X VALUE X'A7'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 168.
+             10 PIC X VALUE X'A8'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 169.
+             10 PIC X VALUE X'A9'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 170.
+             10 PIC X VALUE X'AA'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 171.
+             10 PIC X VALUE X'AB'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 172.
+             10 PIC X VALUE X'AC'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 173.
+             10 PIC X VALUE X'AD'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 174.
+             10 PIC X VALUE X'AE'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 175.
+             10 PIC X VALUE X'AF'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 176.
+             10 PIC X VALUE X'B0'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 177.
+             10 PIC X VALUE X'B1'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 178.
+             10 PIC X VALUE X'B2'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 179.
+             10 PIC X VALUE X'B3'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 180.
+             10 PIC X VALUE X'B4'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 181.
+             10 PIC X VALUE X'B5'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 182.
+             10 PIC X VALUE X'B6'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 183.
+             10 PIC X VALUE X'B7'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 184.
+             10 PIC X VALUE X'B8'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 185.
+             10 PIC X VALUE X'B9'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 186.
+             10 PIC X VALUE X'BA'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 187.
+             10 PIC X VALUE X'BB'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 188.
+             10 PIC X VALUE X'BC'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 189.
+             10 PIC X VALUE X'BD'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 190.
+             10 PIC X VALUE X'BE'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 191.
+             10 PIC X VALUE X'BF'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 192.
+             10 PIC X VALUE X'C0'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 193.
+             10 PIC X VALUE X'C1'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 194.
+             10 PIC X VALUE X'C2'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 195.
+             10 PIC X VALUE X'C3'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 196.
+             10 PIC X VALUE X'C4'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 197.
+             10 PIC X VALUE X'C5'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 198.
+             10 PIC X VALUE X'C6'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 199.
+             10 PIC X VALUE X'C7'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 200.
+             10 PIC X VALUE X'C8'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 201.
+             10 PIC X VALUE X'C9'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 202.
+             10 PIC X VALUE X'CA'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 203.
+             10 PIC X VALUE X'CB'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 204.
+             10 PIC X VALUE X'CC'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 205.
+             10 PIC X VALUE X'CD'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 206.
+             10 PIC X VALUE X'CE'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 207.
+             10 PIC X VALUE X'CF'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 208.
+             10 PIC X VALUE X'D0'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 209.
+             10 PIC X VALUE X'D1'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 210.
+             10 PIC X VALUE X'D2'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 211.
+             10 PIC X VALUE X'D3'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 212.
+             10 PIC X VALUE X'D4'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 213.
+             10 PIC X VALUE X'D5'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 214.
+             10 PIC X VALUE X'D6'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 215.
+             10 PIC X VALUE X'D7'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 216.
+             10 PIC X VALUE X'D8'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 217.
+             10 PIC X VALUE X'D9'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 218.
+             10 PIC X VALUE X'DA'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 219.
+             10 PIC X VALUE X'DB'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 220.
+             10 PIC X VALUE X'DC'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 221.
+             10 PIC X VALUE X'DD'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 222.
+             10 PIC X VALUE X'DE'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 223.
+             10 PIC X VALUE X'DF'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 224.
+             10 PIC X VALUE X'E0'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 225.
+             10 PIC X VALUE X'E1'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 226.
+             10 PIC X VALUE X'E2'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 227.
+             10 PIC X VALUE X'E3'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 228.
+             10 PIC X VALUE X'E4'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 229.
+             10 PIC X VALUE X'E5'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 230.
+             10 PIC X VALUE X'E6'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 231.
+             10 PIC X VALUE X'E7'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 232.
+             10 PIC X VALUE X'E8'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 233.
+             10 PIC X VALUE X'E9'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 234.
+             10 PIC X VALUE X'EA'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 235.
+             10 PIC X VALUE X'EB'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 236.
+             10 PIC X VALUE X'EC'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 237.
+             10 PIC X VALUE X'ED'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 238.
+             10 PIC X VALUE X'EE'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 239.
+             10 PIC X VALUE X'EF'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 240.
+             10 PIC X VALUE X'F0'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 241.
+             10 PIC X VALUE X'F1'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 242.
+             10 PIC X VALUE X'F2'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 243.
+             10 PIC X VALUE X'F3'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 244.
+             10 PIC X VALUE X'F4'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 245.
+             10 PIC X VALUE X'F5'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 246.
+             10 PIC X VALUE X'F6'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 247.
+             10 PIC X VALUE X'F7'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 248.
+             10 PIC X VALUE X'F8'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 249.
+             10 PIC X VALUE X'F9'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 250.
+             10 PIC X VALUE X'FA'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 251.
+             10 PIC X VALUE X'FB'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 252.
+             10 PIC X VALUE X'FC'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 253.
+             10 PIC X VALUE X'FD'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 254.
+             10 PIC X VALUE X'FE'.
+          05 FILLER.
+             10 PIC 9(3) VALUE 255.
+             10 PIC X VALUE X'FF'.
+
+       01 CP437-CHAR REDEFINES PETSCII-TABLE.
+          03 CP437-EL OCCURS 256 INDEXED BY IDX.
+             05 CP437-VAL PIC 9(3).
+             05 CP437-HEX PIC X.
+      /
+       01 INPUT-TEXT  PIC X(80)
+          VALUE "hELLO wOLRD - cp437 test".
+
+       01  WS-CODE-PAGE         PIC S9(4) VALUE 437.
+       01  CHAR-CODE            PIC S9(4) COMP-5.
+       01  WS-COUNT             PIC S9(4) COMP VALUE ZERO.
+       01  F-HANDLE             HANDLE.
+       77  W-CHAR               PIC X(1) COMP-X.
+      /
+       LINKAGE SECTION.
+      /
+       COPY "WPARMS.CPY".
+      /
+       PROCEDURE DIVISION USING W-PARMS.
+      /*---------------------------------------------------------------*
+       MAIN-LOGIC.
+            DISPLAY 'WSERV DEBUG> MAIN-LOGIC'
+            SET W-RESPONSE-NO TO TRUE
+
+            EVALUATE TRUE
+               WHEN OP-CRLF            PERFORM SEND-CRLF
+               WHEN OP-SEND            PERFORM SEND-DATA
+               WHEN OP-BUILD-LISTENER  PERFORM BUILD-LISTENER
+               WHEN OP-BUILD-SOCKET    PERFORM ACCEPT-CLIENT
+               WHEN OP-FLUSH-SOCKET    PERFORM FLUSH-SOCKET
+               WHEN OP-CLOSE-SOCKET    PERFORM DUMMY-PARA
+               WHEN OP-WAIT-USER       PERFORM WAIT-USER
+               WHEN OP-CRSR-CLRHOME    PERFORM CLEAR-HOME
+               WHEN OP-CRSR-HOME       PERFORM DUMMY-PARA
+               WHEN OP-CRSR-RVSON      PERFORM CRSR-RVSON
+               WHEN OP-CRSR-RVSOFF     PERFORM CRSR-RVSOFF
+               WHEN OP-CRSR-LEFT       PERFORM CRSR-LEFT
+               WHEN OP-CRSR-RIGHT      PERFORM DUMMY-PARA
+               WHEN OP-CRSR-UP         PERFORM CRSR-UP
+               WHEN OP-CRSR-DOWN       PERFORM DUMMY-PARA
+               WHEN OP-CRSR-BLACK      PERFORM DUMMY-PARA
+               WHEN OP-CRSR-WHITE      PERFORM CRSR-WHITE
+               WHEN OP-CRSR-RED        PERFORM DUMMY-PARA
+               WHEN OP-CRSR-CYAN       PERFORM DUMMY-PARA
+               WHEN OP-CRSR-PURPLE     PERFORM DUMMY-PARA
+               WHEN OP-CRSR-GREEN      PERFORM DUMMY-PARA
+               WHEN OP-CRSR-BLUE       PERFORM CRSR-BLUE
+               WHEN OP-CRSR-YELLOW     PERFORM CRSR-YELLOW
+               WHEN OP-CRSR-ORANGE     PERFORM DUMMY-PARA
+               WHEN OP-CRSR-BROWN      PERFORM DUMMY-PARA
+               WHEN OP-CRSR-PINK       PERFORM CRSR-PINK
+               WHEN OP-CRSR-DARKGREY   PERFORM CRSR-DARKGREY
+               WHEN OP-CRSR-GREY       PERFORM CRSR-GREY
+               WHEN OP-CRSR-LIGHTGREEN PERFORM CRSR-LIGHTGREEN
+               WHEN OP-CRSR-LIGHTBLUE  PERFORM CRSR-LIGHTBLUE
+               WHEN OP-CRSR-LIGHTGREY  PERFORM DUMMY-PARA
+               WHEN OTHER              PERFORM DUMMY-PARA
+            END-EVALUATE
+
+            GOBACK
+            .
+      /*---------------------------------------------------------------*
+       DUMMY-PARA.
+            CONTINUE
+            .
+      /*---------------------------------------------------------------*
+       CLEAR-HOME.
+            DISPLAY 'DEBUG> CLEAR-HOME'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 147
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       BUILD-LISTENER,
+            CALL "C$SOCKET" USING CSOCKET-CREATE-SERVER,
+                                  SERVER-PORT,
+                           GIVING SERVER-SOCKET.
+
+            IF SERVER-SOCKET < 0
+               DISPLAY "Error creating server socket."
+               STOP RUN
+            END-IF
+
+            DISPLAY "Server listening on port: " SERVER-PORT "..."
+            .
+      /*---------------------------------------------------------------*
+       ACCEPT-CLIENT.
+            CALL "C$SOCKET" USING CSOCKET-ACCEPT,
+                                  SERVER-SOCKET,
+                            GIVING CLIENT-SOCKET.
+
+            IF CLIENT-SOCKET < 0
+               DISPLAY "Client connect error."
+            END-IF
+
+            DISPLAY "Client CONNECTED! Socket ID: " CLIENT-SOCKET.
+            .
+      /*---------------------------------------------------------------*
+      * CONVERT-TO-CP437.
+      *      PERFORM VARYING IDX FROM 1 BY 1
+      *       UNTIL IDX > LENGTH OF INPUT-TEXT
+      *        MOVE FUNCTION ORD(INPUT-TEXT(IDX:1)) TO CHAR-CODE
+      *        IF CHAR-CODE >= 1 AND CHAR-CODE <= 256
+      *            MOVE CP437-BYTE(CHAR-CODE)
+      *                TO BUFFER-OUT(IDX:1)
+      *        ELSE
+      *            MOVE "?" TO BUFFER-OUT(IDX:1)
+      *        END-IF
+      *      END-PERFORM
+      *      .
+      /*---------------------------------------------------------------*
+       SEND-DATA.
+            DISPLAY 'DEBUG> SEND-DATA'
+            MOVE W-DATA TO FINAL-BUFFER
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       SEND-CRLF.
+            DISPLAY 'DEBUG> SEND-CRLF'
+            MOVE X'0D0A' TO FINAL-BUFFER
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-WHITE.
+            DISPLAY 'DEBUG> CRSR-WHITE'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 5
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-UP.
+            DISPLAY 'DEBUG> CRSR-UP'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 145
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-LEFT.
+            DISPLAY 'DEBUG> CRSR-LEFT'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 157
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-RVSON.
+            DISPLAY 'DEBUG> CRSR-RVSON'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 18
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-RVSOFF.
+            DISPLAY 'DEBUG> CRSR-RVSOFF'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 146
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-PINK.
+            DISPLAY 'DEBUG> CRSR-PINK'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 150
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-DARKGREY.
+            DISPLAY 'DEBUG> CRSR-DARKGREY'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 151
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-GREY.
+            DISPLAY 'DEBUG> CRSR-GREY'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 152
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-LIGHTGREEN.
+            DISPLAY 'DEBUG> CRSR-LIGHTGREEN'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 153
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-YELLOW.
+            DISPLAY 'DEBUG> CRSR-YELLOW'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 158
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-BLUE.
+            DISPLAY 'DEBUG> CRSR-BLUE'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 31
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-LIGHTBLUE.
+            DISPLAY 'DEBUG> CRSR-LIGHTBLUE'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 154
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       FLUSH-SOCKET.
+            DISPLAY 'DEBUG> FLUSH-SOCKET'
+            CALL "C$SOCKET" USING CSOCKET-FLUSH, CLIENT-SOCKET
+            .
+*---------------------------------------------------------------*
+       WAIT-USER.
+           DISPLAY 'DEBUG> In ascolto tasti in tempo reale dal C64...'
+           MOVE SPACES TO W-RETURNED-ANSWER
+           MOVE 1      TO IDX
+
+           PERFORM UNTIL 1 = 2
+               MOVE 1 TO SOCKET-TIMEOUT
+
+               CALL "C$SOCKET" USING CSOCKET-NEXT-READ,
+                                     SERVER-SOCKET,
+                                     SOCKET-TIMEOUT
+                          GIVING READY-SOCKET
+
+               IF READY-SOCKET > 0
+                  IF READY-SOCKET = CLIENT-SOCKET
+                     MOVE SPACES TO BUFFER-IN
+                     CALL "C$SOCKET" USING CSOCKET-READ,
+                                           CLIENT-SOCKET,
+                                           BUFFER-IN,
+                                           1,
+                                     GIVING BYTES-READ
+
+                     IF BYTES-READ > 0
+                        DISPLAY ">>> TASTO RICEVUTO: [" BUFFER-IN(1:1)
+                        "] | Codice ORD: " FUNCTION ORD(BUFFER-IN(1:1))
+
+      * ................ LOCAL ECHO AND BUFFERING
+                        IF BUFFER-IN(1:1) = X'0D'
+                           SET W-RESPONSE-YES TO TRUE
+                           EXIT PERFORM
+                        END-IF
+
+                        IF IDX <= LENGTH OF W-RETURNED-ANSWER
+                           MOVE BUFFER-IN(1:1) 
+                             TO W-RETURNED-ANSWER(IDX:1)
+                           ADD 1 TO IDX
+                        END-IF
+
+                        CALL "C$SOCKET" USING CSOCKET-WRITE,
+                                              CLIENT-SOCKET,
+                                              BUFFER-IN,
+                                              1,
+                                        GIVING BYTES-SENT
+                     END-IF
+                  END-IF
+               END-IF
+           END-PERFORM
+           .
+      /*---------------------------------------------------------------*
+       WRITE-SOCKET.
+            DISPLAY 'DEBUG > WRITE-SOCKET'
+            MOVE ZERO TO WS-COUNT
+
+            INSPECT FINAL-BUFFER
+                    REPLACING TRAILING SPACES BY HIGH-VALUES
+            INSPECT FINAL-BUFFER
+                    TALLYING WS-COUNT FOR CHARACTERS BEFORE HIGH-VALUES
+
+            COMPUTE MSG-LEN = WS-COUNT
+
+            CALL "C$SOCKET" USING CSOCKET-WRITE,
+                                 CLIENT-SOCKET,
+                                 FINAL-BUFFER,
+                                 MSG-LEN
+                          GIVING BYTES-SENT
+
+            IF BYTES-SENT > 0
+                DISPLAY "Bytes SENT: " BYTES-SENT
+            END-IF
+            .
