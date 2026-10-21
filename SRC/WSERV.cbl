@@ -820,6 +820,8 @@
             DISPLAY 'WSERV DEBUG> MAIN-LOGIC'
             SET W-RESPONSE-NO TO TRUE
 
+            CALL "C$SLEEP" USING 0.2
+
             EVALUATE TRUE
                WHEN OP-CRLF            PERFORM SEND-CRLF
                WHEN OP-SEND            PERFORM SEND-DATA

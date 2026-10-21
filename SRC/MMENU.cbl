@@ -23,13 +23,14 @@
 
       *---------------------------------------------------------------*
        HANDLE-CLIENT-SESSION.
-            SET OP-CRSR-CLRHOME TO TRUE
-            CALL "WSERV" USING W-PARMS
+           SET OP-CRSR-CLRHOME TO TRUE
+           CALL "WSERV" USING W-PARMS
 
            SET OP-CRSR-RVSON TO TRUE
            CALL "WSERV" USING W-PARMS
 
            SET OP-SEND TO TRUE
-           STRING ' WELCOME ' W-RETURNED-ANSWER INTO W-DATA
+           STRING ' WELCOME ' 
+                  W-RETURNED-ANSWER INTO W-DATA
            CALL "WSERV" USING W-PARMS
            .
