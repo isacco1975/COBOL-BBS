@@ -349,6 +349,8 @@
              DELIMITED BY SIZE INTO W-DATA
            PERFORM SEND-MSG
 
+           SET OP-CRSR-YELLOW TO TRUE
+           CALL "WSERV" USING W-PARMS
            SET OP-SEND TO TRUE
            MOVE 'QUANTA NE BEVI? > ' TO W-DATA
            CALL "WSERV" USING W-PARMS
