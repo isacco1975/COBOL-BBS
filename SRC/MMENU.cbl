@@ -57,7 +57,7 @@
            CALL "WSERV" USING W-PARMS
 
            SET OP-SEND TO TRUE
-           MOVE ' 1. PAGE a ' TO W-DATA
+           MOVE ' 1. gioco della BIRRA ' TO W-DATA
            CALL "WSERV" USING W-PARMS
 
            SET OP-CRLF TO TRUE
@@ -88,7 +88,7 @@
               CALL "WSERV" USING W-PARMS
 
               IF W-RETURNED-ANSWER(1:1) = '1'
-                 CALL "SUB1" USING W-PARMS
+                 CALL "BIRRA" USING W-PARMS
               END-IF
 
               IF W-RETURNED-ANSWER(1:1) = '2'

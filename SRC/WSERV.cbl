@@ -831,23 +831,23 @@
                WHEN OP-CLOSE-SOCKET    PERFORM DUMMY-PARA
                WHEN OP-WAIT-USER       PERFORM WAIT-USER
                WHEN OP-CRSR-CLRHOME    PERFORM CLEAR-HOME
-               WHEN OP-CRSR-HOME       PERFORM DUMMY-PARA
+               WHEN OP-CRSR-HOME       PERFORM CRSR-HOME
                WHEN OP-CRSR-RVSON      PERFORM CRSR-RVSON
                WHEN OP-CRSR-RVSOFF     PERFORM CRSR-RVSOFF
                WHEN OP-CRSR-LEFT       PERFORM CRSR-LEFT
-               WHEN OP-CRSR-RIGHT      PERFORM DUMMY-PARA
+               WHEN OP-CRSR-RIGHT      PERFORM CRSR-RIGHT
                WHEN OP-CRSR-UP         PERFORM CRSR-UP
-               WHEN OP-CRSR-DOWN       PERFORM DUMMY-PARA
-               WHEN OP-CRSR-BLACK      PERFORM DUMMY-PARA
+               WHEN OP-CRSR-DOWN       PERFORM CRSR-DOWN 
+               WHEN OP-CRSR-BLACK      PERFORM CRSR-BLACK
                WHEN OP-CRSR-WHITE      PERFORM CRSR-WHITE
-               WHEN OP-CRSR-RED        PERFORM DUMMY-PARA
-               WHEN OP-CRSR-CYAN       PERFORM DUMMY-PARA
-               WHEN OP-CRSR-PURPLE     PERFORM DUMMY-PARA
-               WHEN OP-CRSR-GREEN      PERFORM DUMMY-PARA
+               WHEN OP-CRSR-RED        PERFORM CRSR-RED
+               WHEN OP-CRSR-CYAN       PERFORM CRSR-CYAN
+               WHEN OP-CRSR-PURPLE     PERFORM CRSR-PURPLE
+               WHEN OP-CRSR-GREEN      PERFORM CRSR-GREEN
                WHEN OP-CRSR-BLUE       PERFORM CRSR-BLUE
                WHEN OP-CRSR-YELLOW     PERFORM CRSR-YELLOW
-               WHEN OP-CRSR-ORANGE     PERFORM DUMMY-PARA
-               WHEN OP-CRSR-BROWN      PERFORM DUMMY-PARA
+               WHEN OP-CRSR-ORANGE     PERFORM CRSR-ORANGE
+               WHEN OP-CRSR-BROWN      PERFORM CRSR-BROWN
                WHEN OP-CRSR-PINK       PERFORM CRSR-PINK
                WHEN OP-CRSR-DARKGREY   PERFORM CRSR-DARKGREY
                WHEN OP-CRSR-GREY       PERFORM CRSR-GREY
@@ -862,6 +862,18 @@
       /*---------------------------------------------------------------*
        DUMMY-PARA.
             CONTINUE
+            .
+      /*---------------------------------------------------------------*
+       CRSR-HOME.
+            DISPLAY 'DEBUG> CRSR-HOME'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 83 
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
             .
       /*---------------------------------------------------------------*
        CLEAR-HOME.
@@ -901,19 +913,6 @@
             DISPLAY "Client CONNECTED! Socket ID: " CLIENT-SOCKET.
             .
       /*---------------------------------------------------------------*
-      * CONVERT-TO-CP437.
-      *      PERFORM VARYING IDX FROM 1 BY 1
-      *       UNTIL IDX > LENGTH OF INPUT-TEXT
-      *        MOVE FUNCTION ORD(INPUT-TEXT(IDX:1)) TO CHAR-CODE
-      *        IF CHAR-CODE >= 1 AND CHAR-CODE <= 256
-      *            MOVE CP437-BYTE(CHAR-CODE)
-      *                TO BUFFER-OUT(IDX:1)
-      *        ELSE
-      *            MOVE "?" TO BUFFER-OUT(IDX:1)
-      *        END-IF
-      *      END-PERFORM
-      *      .
-      /*---------------------------------------------------------------*
        SEND-DATA.
             DISPLAY 'DEBUG> SEND-DATA'
             MOVE W-DATA TO FINAL-BUFFER
@@ -926,12 +925,84 @@
             PERFORM WRITE-SOCKET
             .
       /*---------------------------------------------------------------*
+       CRSR-PURPLE.
+            DISPLAY 'DEBUG> CRSR-PURPLE'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 220
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-BROWN.
+            DISPLAY 'DEBUG> CRSR-BROWN'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 213
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-ORANGE.
+            DISPLAY 'DEBUG> CRSR-ORANGE'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 193
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-GREEN.
+            DISPLAY 'DEBUG> CRSR-GREEN'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 94
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-RED.
+            DISPLAY 'DEBUG> CRSR-RED'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 92
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
        CRSR-WHITE.
             DISPLAY 'DEBUG> CRSR-WHITE'
 
             SET IDX TO 1
             SEARCH CP437-EL VARYING IDX
                   WHEN    CP437-VAL(IDX) = 5
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-BLACK.
+            DISPLAY 'DEBUG> CRSR-BLACK'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 144
                      MOVE CP437-HEX(IDX) TO FINAL-BUFFER
             END-SEARCH
 
@@ -956,6 +1027,30 @@
             SET IDX TO 1
             SEARCH CP437-EL VARYING IDX
                   WHEN    CP437-VAL(IDX) = 157
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-RIGHT.
+            DISPLAY 'DEBUG> CRSR-RIGHT'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 93
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-DOWN.
+            DISPLAY 'DEBUG> CRSR-DOWN'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 81
                      MOVE CP437-HEX(IDX) TO FINAL-BUFFER
             END-SEARCH
 
@@ -992,6 +1087,18 @@
             SET IDX TO 1
             SEARCH CP437-EL VARYING IDX
                   WHEN    CP437-VAL(IDX) = 150
+                     MOVE CP437-HEX(IDX) TO FINAL-BUFFER
+            END-SEARCH
+
+            PERFORM WRITE-SOCKET
+            .
+      /*---------------------------------------------------------------*
+       CRSR-CYAN.
+            DISPLAY 'DEBUG> CRSR-CYAN'
+
+            SET IDX TO 1
+            SEARCH CP437-EL VARYING IDX
+                  WHEN    CP437-VAL(IDX) = 223
                      MOVE CP437-HEX(IDX) TO FINAL-BUFFER
             END-SEARCH
 
