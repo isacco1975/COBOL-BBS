@@ -60,6 +60,7 @@
               CALL "WSERV" USING W-PARMS
 
               IF W-RESPONSE-YES
+                 *> Va a capo subito dopo l'invio del giocatore
                  SET OP-CRLF TO TRUE
                  CALL "WSERV" USING W-PARMS
 
@@ -75,14 +76,15 @@
                        MOVE 1 TO WS-STATE
                        PERFORM GESTISCI-MENU-DISPLAY
                  END-EVALUATE
-                 
+
+                 *> Pulisce la risposta per evitare loop indesiderati
                  MOVE SPACES TO W-RETURNED-ANSWER
               END-IF
            END-PERFORM
            .
 
       *---------------------------------------------------------------*
-      * ROUTINE SUPPORTO: INVIA MESSAGGIO CON CRLF AUTOMATICO
+      * ROUTINE SUPPORTO: INVIA MESSAGGIO CON OP-SEND E CRLF
       *---------------------------------------------------------------*
        SEND-MSG.
            SET OP-SEND TO TRUE
@@ -96,43 +98,17 @@
            SET OP-CRSR-WHITE TO TRUE
            CALL "WSERV" USING W-PARMS
 
-           EVALUATE LANG-PAGE
-              WHEN '1'
-                 MOVE 'PREMI I PER INIZIARE' TO W-DATA
-                 PERFORM SEND-MSG
+           MOVE 'PREMI I PER INIZIARE' TO W-DATA
+           PERFORM SEND-MSG
 
-                 MOVE 'PREMI R PER LE REGOLE' TO W-DATA
-                 PERFORM SEND-MSG
+           MOVE 'PREMI R PER LE REGOLE' TO W-DATA
+           PERFORM SEND-MSG
 
-                 MOVE 'PREMI F PER USCIRE' TO W-DATA
-                 PERFORM SEND-MSG
-                 SET OP-CRLF TO TRUE
-                 CALL "WSERV" USING W-PARMS
+           MOVE 'PREMI F PER USCIRE' TO W-DATA
+           PERFORM SEND-MSG
 
-              WHEN '2'
-                 MOVE 'PRESS I TO START GAME' TO W-DATA
-                 PERFORM SEND-MSG
-
-                 MOVE 'PRESS R TO SEE RULES' TO W-DATA
-                 PERFORM SEND-MSG
-
-                 MOVE 'PRESS F TO EXIT' TO W-DATA
-                 PERFORM SEND-MSG
-                 SET OP-CRLF TO TRUE
-                 CALL "WSERV" USING W-PARMS
-
-              WHEN '3'
-                 MOVE 'PRESIONE I PARA INICIAR EL JUEGO' TO W-DATA
-                 PERFORM SEND-MSG
-
-                 MOVE 'PRESIONE R PARA LEER LAS REGLAS' TO W-DATA
-                 PERFORM SEND-MSG
-
-                 MOVE 'PRESIONE F PARA TERMINAR' TO W-DATA
-                 PERFORM SEND-MSG
-                 SET OP-CRLF TO TRUE
-                 CALL "WSERV" USING W-PARMS
-           END-EVALUATE
+           SET OP-CRLF TO TRUE
+           CALL "WSERV" USING W-PARMS
 
            SET OP-SEND TO TRUE
            MOVE ' > ' TO W-DATA
@@ -150,8 +126,6 @@
            ELSE IF W-RETURNED-ANSWER(1:1) = 'F' OR 'f'
               SET OP-CRSR-ORANGE TO TRUE
               CALL "WSERV" USING W-PARMS
-              SET OP-CRSR-BLACK TO TRUE
-              CALL "WSERV" USING W-PARMS
               MOVE 'LOGOUT DAL GIOCO. PREMI RETURN' TO W-DATA
               PERFORM SEND-MSG
               MOVE 6 TO WS-STATE
@@ -168,7 +142,7 @@
        MOSTRA-REGOLE.
            SET OP-CRSR-WHITE TO TRUE
            CALL "WSERV" USING W-PARMS
-           
+
            MOVE 'REGOLE DEL GIOCO:' TO W-DATA
            PERFORM SEND-MSG
 
@@ -192,10 +166,10 @@
       *---------------------------------------------------------------*
        INIZIA-PARTITA.
            PERFORM UNTIL WS-RAND-VAL > 30
-              COMPUTE WS-RAND-VAL = FUNCTION CURRENT-DATE(15:2) 
+              MOVE FUNCTION CURRENT-DATE(15:2) TO WS-RAND-VAL
            END-PERFORM
-   
-           COMPUTE D-BOCK = FUNCTION MOD(WS-RAND-VAL, 99) + 1
+
+           COMPUTE D-BOCK = FUNCTION MOD(WS-RAND-VAL, 100) + 1
            MOVE 4 TO WS-STATE
 
            SET OP-CRSR-YELLOW TO TRUE
@@ -239,9 +213,12 @@
 
            COMPUTE WS-A-VAL = FUNCTION NUMVAL(WS-TEMP-STR)
            IF WS-A-VAL < 1
-              SET OP-CRSR-PURPLE TO TRUE
+              SET OP-CRSR-CYAN TO TRUE
               CALL "WSERV" USING W-PARMS
               MOVE 'ASTEMIO! BEVINE UN PO''. QUANTA NE BEVI? ' TO W-DATA
+              PERFORM SEND-MSG
+              SET OP-SEND TO TRUE
+              MOVE '> ' TO W-DATA
               CALL "WSERV" USING W-PARMS
               EXIT PARAGRAPH
            END-IF
@@ -251,6 +228,9 @@
               SET OP-CRSR-PURPLE TO TRUE
               CALL "WSERV" USING W-PARMS
               MOVE 'MA LE SAI LE REGOLE? QUANTA NE BEVI? ' TO W-DATA
+              PERFORM SEND-MSG
+              SET OP-SEND TO TRUE
+              MOVE '> ' TO W-DATA
               CALL "WSERV" USING W-PARMS
               EXIT PARAGRAPH
            END-IF
@@ -266,7 +246,7 @@
               PERFORM SEND-MSG
               MOVE 6 TO WS-STATE
               MOVE 'PREMI RETURN PER USCIRE' TO W-DATA
-              CALL "WSERV" USING W-PARMS
+              PERFORM SEND-MSG
               EXIT PARAGRAPH
            END-IF
 
@@ -312,14 +292,14 @@
               IF WS-MAX-R > WS-MIN-R
                  CALL "C$RANDOM" GIVING WS-RAND-VAL
                  COMPUTE WS-TEMP-VAL = (WS-MAX-R - WS-MIN-R) + 1
-                 COMPUTE WS-MOD-RES  = 
+                 COMPUTE WS-MOD-RES  =
                          FUNCTION MOD(WS-RAND-VAL, WS-TEMP-VAL)
                  COMPUTE WS-A-VAL    = WS-MIN-R + WS-MOD-RES
               ELSE
                  MOVE WS-HALF TO WS-A-VAL
               END-IF
            END-IF
-           
+
            COMPUTE WS-BEVUTA = D-BOCK - WS-A-VAL
            COMPUTE WS-MAX-CONS = D-BOCK / 2
            IF WS-BEVUTA > WS-MAX-CONS
@@ -340,13 +320,13 @@
            PERFORM SEND-MSG
 
            IF D-BOCK = 1
-              SET OP-CRSR-PURPLE TO TRUE
+              SET OP-CRSR-ORANGE TO TRUE
               CALL "WSERV" USING W-PARMS
               MOVE 'COME ERA CHIARO... HO VINTO IO!' TO W-DATA
               PERFORM SEND-MSG
               MOVE 6 TO WS-STATE
               MOVE 'PREMI RETURN PER USCIRE' TO W-DATA
-              CALL "WSERV" USING W-PARMS
+              PERFORM SEND-MSG
               EXIT PARAGRAPH
            END-IF
 
@@ -357,10 +337,10 @@
            STRING 'NEL BOCCALE ORA CI SONO ' D-BOCK-ED ' MM.'
              DELIMITED BY SIZE INTO W-DATA
            PERFORM SEND-MSG
-           
+
            SET OP-SEND TO TRUE
            MOVE 'QUANTA NE BEVI? > ' TO W-DATA
            CALL "WSERV" USING W-PARMS
            MOVE 4 TO WS-STATE
            .
-           
+```

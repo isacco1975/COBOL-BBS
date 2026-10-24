@@ -1098,7 +1098,7 @@
 
             SET IDX TO 1
             SEARCH CP437-EL VARYING IDX
-                  WHEN    CP437-VAL(IDX) = 150
+                  WHEN    CP437-VAL(IDX) = 223
                      MOVE CP437-HEX(IDX) TO FINAL-BUFFER
             END-SEARCH
 

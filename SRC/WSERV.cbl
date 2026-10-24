@@ -819,7 +819,8 @@
        MAIN-LOGIC.
             DISPLAY 'WSERV DEBUG> MAIN-LOGIC'
             SET W-RESPONSE-NO TO TRUE
-
+            MOVE SPACES TO FINAL-BUFFER
+            
             CALL "C$SLEEP" USING 0.2
 
             EVALUATE TRUE
