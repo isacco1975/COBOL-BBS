@@ -44,6 +44,8 @@
        77 WS-MOD-RES           PIC S9(4) COMP VALUE 0.
       /
        PROCEDURE DIVISION.
+      /
+      /
       *---------------------------------------------------------------*
        MAIN-LOGIC.
            DISPLAY 'DEBUG> BIRRA - Avvio Gioco...'
@@ -82,7 +84,7 @@
               END-IF
            END-PERFORM
            .
-
+      /
       *---------------------------------------------------------------*
       * ROUTINE SUPPORTO: INVIA MESSAGGIO CON OP-SEND E CRLF
       *---------------------------------------------------------------*
@@ -92,7 +94,7 @@
            SET OP-CRLF TO TRUE
            CALL "WSERV" USING W-PARMS
            .
-
+      /
       *---------------------------------------------------------------*
        GESTISCI-MENU-DISPLAY.
            SET OP-CRSR-WHITE TO TRUE
@@ -114,7 +116,7 @@
            MOVE ' > ' TO W-DATA
            CALL "WSERV" USING W-PARMS
            .
-
+      /
       *---------------------------------------------------------------*
        ROUTINE-MENU.
            IF W-RETURNED-ANSWER(1:1) = 'I' OR 'i'
@@ -137,7 +139,7 @@
               PERFORM GESTISCI-MENU-DISPLAY
            END-IF
            .
-
+      /
       *---------------------------------------------------------------*
        MOSTRA-REGOLE.
            SET OP-CRSR-WHITE TO TRUE
@@ -162,7 +164,7 @@
 
            PERFORM GESTISCI-MENU-DISPLAY
            .
-
+      /
       *---------------------------------------------------------------*
        INIZIA-PARTITA.
            PERFORM UNTIL WS-RAND-VAL > 30
@@ -189,7 +191,7 @@
            CALL "WSERV" USING W-PARMS
            MOVE SPACES TO W-RETURNED-ANSWER
            .
-
+      /
       *---------------------------------------------------------------*
        GESTISCI-TURNO-GIOCATORE.
            SET OP-CRSR-WHITE TO TRUE
@@ -215,7 +217,11 @@
            IF WS-A-VAL < 1
               SET OP-CRSR-CYAN TO TRUE
               CALL "WSERV" USING W-PARMS
-              MOVE 'ASTEMIO! BEVINE UN PO''. QUANTA NE BEVI? ' TO W-DATA
+              MOVE 'ASTEMIO! BEVINE UN PO''' TO W-DATA
+              PERFORM SEND-MSG
+              SET OP-CRSR-YELLOW TO TRUE
+              CALL "WSERV" USING W-PARMS
+              MOVE 'qUANTA NE BEVI?'  TO W-DATA
               PERFORM SEND-MSG
               SET OP-SEND TO TRUE
               MOVE '> ' TO W-DATA
@@ -227,8 +233,13 @@
            IF WS-A-VAL > WS-HALF
               SET OP-CRSR-PURPLE TO TRUE
               CALL "WSERV" USING W-PARMS
-              MOVE 'MA LE SAI LE REGOLE? QUANTA NE BEVI? ' TO W-DATA
+              MOVE 'MA LE SAI LE REGOLE?' TO W-DATA
               PERFORM SEND-MSG
+              SET OP-CRSR-YELLOW TO TRUE
+              CALL "WSERV" USING W-PARMS
+              MOVE 'qUANTA NE BEVI?'  TO W-DATA
+              PERFORM SEND-MSG
+              CALL "WSERV" USING W-PARMS
               SET OP-SEND TO TRUE
               MOVE '> ' TO W-DATA
               CALL "WSERV" USING W-PARMS
@@ -250,7 +261,7 @@
               EXIT PARAGRAPH
            END-IF
 
-           SET OP-CRSR-YELLOW TO TRUE
+           SET OP-CRSR-ORANGE TO TRUE
            CALL "WSERV" USING W-PARMS
            MOVE SPACES TO W-DATA
            MOVE D-BOCK TO D-BOCK-ED
@@ -261,7 +272,7 @@
       * Turno Computer
            PERFORM ESEGUI-TURNO-COMPUTER
            .
-
+      /
       *---------------------------------------------------------------*
        ESEGUI-TURNO-COMPUTER.
            MOVE 0 TO WS-A-VAL
@@ -343,4 +354,5 @@
            CALL "WSERV" USING W-PARMS
            MOVE 4 TO WS-STATE
            .
-```
+      /
+      *---------------------------------------------------------------*

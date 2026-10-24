@@ -931,7 +931,7 @@
 
             SET IDX TO 1
             SEARCH CP437-EL VARYING IDX
-                  WHEN    CP437-VAL(IDX) = 220
+                  WHEN    CP437-VAL(IDX) = 156
                      MOVE CP437-HEX(IDX) TO FINAL-BUFFER
             END-SEARCH
 
@@ -943,7 +943,7 @@
 
             SET IDX TO 1
             SEARCH CP437-EL VARYING IDX
-                  WHEN    CP437-VAL(IDX) = 213
+                  WHEN    CP437-VAL(IDX) = 149
                      MOVE CP437-HEX(IDX) TO FINAL-BUFFER
             END-SEARCH
 
@@ -955,7 +955,7 @@
 
             SET IDX TO 1
             SEARCH CP437-EL VARYING IDX
-                  WHEN    CP437-VAL(IDX) = 193
+                  WHEN    CP437-VAL(IDX) = 129
                      MOVE CP437-HEX(IDX) TO FINAL-BUFFER
             END-SEARCH
 
@@ -967,7 +967,7 @@
 
             SET IDX TO 1
             SEARCH CP437-EL VARYING IDX
-                  WHEN    CP437-VAL(IDX) = 94
+                  WHEN    CP437-VAL(IDX) = 30
                      MOVE CP437-HEX(IDX) TO FINAL-BUFFER
             END-SEARCH
 
@@ -979,7 +979,7 @@
 
             SET IDX TO 1
             SEARCH CP437-EL VARYING IDX
-                  WHEN    CP437-VAL(IDX) = 92
+                  WHEN    CP437-VAL(IDX) = 28
                      MOVE CP437-HEX(IDX) TO FINAL-BUFFER
             END-SEARCH
 
@@ -1099,7 +1099,7 @@
 
             SET IDX TO 1
             SEARCH CP437-EL VARYING IDX
-                  WHEN    CP437-VAL(IDX) = 223
+                  WHEN    CP437-VAL(IDX) = 159
                      MOVE CP437-HEX(IDX) TO FINAL-BUFFER
             END-SEARCH
 
