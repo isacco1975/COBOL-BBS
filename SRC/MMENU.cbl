@@ -53,11 +53,17 @@
            SET OP-CRLF TO TRUE
            CALL "WSERV" USING W-PARMS
 
+           SET OP-CRLF TO TRUE
+           CALL "WSERV" USING W-PARMS
+
            SET OP-CRSR-LIGHTBLUE TO TRUE
            CALL "WSERV" USING W-PARMS
 
            SET OP-SEND TO TRUE
-           MOVE ' 1. gioco della BIRRA ' TO W-DATA
+           MOVE ' 1. GIOCO birra ' TO W-DATA
+           CALL "WSERV" USING W-PARMS
+
+           SET OP-CRLF TO TRUE
            CALL "WSERV" USING W-PARMS
 
            SET OP-CRLF TO TRUE
@@ -65,6 +71,9 @@
 
            SET OP-SEND TO TRUE
            MOVE ' 2. PAGE b ' TO W-DATA
+           CALL "WSERV" USING W-PARMS
+
+           SET OP-CRLF TO TRUE
            CALL "WSERV" USING W-PARMS
 
            SET OP-CRLF TO TRUE
